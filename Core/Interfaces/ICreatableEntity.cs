@@ -1,11 +1,8 @@
-﻿using Core.Interfaces;
+﻿namespace Core.Interfaces;
 
-namespace Core.Entities;
-
-public class DataType : ICreatableEntity
+public interface ICreatableEntity
 {
     public Guid Id { get; set; }
-    public string Name { get; set; }
     public DateTimeOffset CreatedDate { get; set; }
     public DateTimeOffset ModifiedDate { get; set; }
 }

@@ -1,6 +1,8 @@
-﻿namespace Core.Entities;
+﻿using Core.Interfaces;
 
-public class SchemaField
+namespace Core.Entities;
+
+public class SchemaField : ICreatableEntity
 {
     public Guid Id { get; set; }
     public bool IsPrimaryKey { get; set; }
@@ -13,4 +15,6 @@ public class SchemaField
     public DataType DataType { get; set; }
     public string ValidatorJson { get; set; }  
     public bool IsArray { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset ModifiedDate { get; set; }
 }
