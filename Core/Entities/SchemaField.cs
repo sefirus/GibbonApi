@@ -15,6 +15,8 @@ public class SchemaField : ICreatableEntity
     public DataType DataType { get; set; }
     public string ValidatorJson { get; set; }  
     public bool IsArray { get; set; }
+    public List<FieldValue> FieldValues { get; set; }
+    public List<SchemaField>? ChildFields { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime ModifiedDate { get; set; }
 }

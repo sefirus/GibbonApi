@@ -10,6 +10,7 @@ public class Workspace : ICreatableEntity
     public User Owner { get; set; }
     public bool IsAiEnabled { get; set; }
     public List<WorkspacePermission> WorkspacePermissions { get; set; }
+    public List<SchemaObject> SchemaObjects { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime ModifiedDate { get; set; }
 }
