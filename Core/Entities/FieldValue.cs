@@ -11,6 +11,6 @@ public class FieldValue : ICreatableEntity
     public SchemaField SchemaField { get; set; }
     public string Value { get; set; } 
     public bool IsGenerated { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }
-    public DateTimeOffset ModifiedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 }

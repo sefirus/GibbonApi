@@ -15,6 +15,6 @@ public class SchemaField : ICreatableEntity
     public DataType DataType { get; set; }
     public string ValidatorJson { get; set; }  
     public bool IsArray { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }
-    public DateTimeOffset ModifiedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 }

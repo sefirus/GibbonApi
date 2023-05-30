@@ -9,6 +9,8 @@ public class User : ICreatableEntity
     public string Email { get; set; }
     public Guid ApplicationRoleId { get; set; }
     public Role ApplicationRole { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }
-    public DateTimeOffset ModifiedDate { get; set; }
+    public List<Workspace> OwnedWorkspaces { get; set; }
+    public List<WorkspacePermission> WorkspacePermissions { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 }

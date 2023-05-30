@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using DataAccess.ModelsConfigurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess;
@@ -14,4 +15,9 @@ public class GibbonDbContext : DbContext
     public DbSet<SchemaField> SchemaFields { get; set; }
     public DbSet<FieldValue> FieldValues { get; set; }
     public DbSet<StoredDocument> StoredDocuments { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
+    }
 }

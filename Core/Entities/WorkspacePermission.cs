@@ -11,6 +11,6 @@ public class WorkspacePermission : ICreatableEntity
     public User User { get; set; }
     public Guid WorkspaceId { get; set; }
     public Workspace Workspace { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }
-    public DateTimeOffset ModifiedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 }

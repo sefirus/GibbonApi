@@ -9,6 +9,7 @@ public class Workspace : ICreatableEntity
     public Guid OwnerId { get; set; }
     public User Owner { get; set; }
     public bool IsAiEnabled { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }
-    public DateTimeOffset ModifiedDate { get; set; }
+    public List<WorkspacePermission> WorkspacePermissions { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 }
