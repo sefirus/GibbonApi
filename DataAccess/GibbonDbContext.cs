@@ -15,6 +15,8 @@ public class GibbonDbContext : DbContext
     public DbSet<SchemaField> SchemaFields { get; set; }
     public DbSet<FieldValue> FieldValues { get; set; }
     public DbSet<StoredDocument> StoredDocuments { get; set; }
+    
+    public GibbonDbContext(DbContextOptions<GibbonDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
