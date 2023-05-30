@@ -2,7 +2,7 @@
 
 namespace Core.Entities;
 
-public class Role : ICreatableEntity
+public class DataType : ICreatableEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
