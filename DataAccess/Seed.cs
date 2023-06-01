@@ -1,0 +1,44 @@
+﻿using Core.Entities;
+using Core.Enums;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+namespace DataAccess;
+
+public static class Seed
+{
+    public static void SeedRoles(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Role>().HasData(new[]
+        {
+            new Role() {Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), Name = RolesEnum.SuperUser},
+            new Role() {Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), Name = RolesEnum.RegularUser},
+            new Role() {Id = Guid.Parse("00000000-0000-0000-0000-000000000011"), Name = RolesEnum.Owner},
+            new Role() {Id = Guid.Parse("00000000-0000-0000-0000-000000000012"), Name = RolesEnum.Admin},
+            new Role() {Id = Guid.Parse("00000000-0000-0000-0000-000000000013"), Name = RolesEnum.RegularUser},
+        });
+    }
+
+    public static void SeedAdmin(this ModelBuilder modelBuilder)
+    {
+        const string userName = "dev";
+        const string email = "dev@email.com";
+        var hasher = new PasswordHasher<User>();
+        var admin = new User()
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+            ApplicationRoleId = Guid.Parse("00000000-0000-0000-0000-000000000001"), // SuperUser
+            UserName = userName,
+            NormalizedUserName = userName.ToUpper(),
+            Email = email,
+            NormalizedEmail = email.ToUpper(),
+            PhoneNumber = "00 000 000 0000",
+            SecurityStamp = Guid.NewGuid().ToString(),
+            IsActive = true
+        };
+        admin.PasswordHash = hasher.HashPassword(admin, "Password123");
+        // seed admin
+        modelBuilder.Entity<User>().HasData(admin);
+        // assign applicationRole role 
+    }
+}

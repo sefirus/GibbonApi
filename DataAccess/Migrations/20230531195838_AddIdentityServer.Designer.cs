@@ -3,6 +3,7 @@ using System;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(GibbonDbContext))]
-    partial class GibbonDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230531195838_AddIdentityServer")]
+    partial class AddIdentityServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,43 +99,6 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "SuperUser"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000002"),
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "RegularUser"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000011"),
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Owner"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000012"),
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Admin"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000013"),
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "RegularUser"
-                        });
                 });
 
             modelBuilder.Entity("Core.Entities.SchemaField", b =>
@@ -293,34 +259,15 @@ namespace DataAccess.Migrations
                     b.Property<string>("UserName")
                         .HasColumnType("text");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationRoleId");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
-                            AccessFailedCount = 0,
-                            ApplicationRoleId = new Guid("00000000-0000-0000-0000-000000000001"),
-                            ConcurrencyStamp = "4f9b027e-02aa-4733-9383-17fb66dbfa97",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "dev@email.com",
-                            EmailConfirmed = false,
-                            IsActive = true,
-                            LockoutEnabled = false,
-                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormalizedEmail = "DEV@EMAIL.COM",
-                            NormalizedUserName = "DEV",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFZxrdmM2F2j4owh3AaFYfZj0F7PLGFDSk+kj5XYHKS4UCg+h3CwCwrzx8NPOqwneQ==",
-                            PhoneNumber = "00 000 000 0000",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "e7fa2f62-59d5-4b32-a856-db6e8aad812d",
-                            TwoFactorEnabled = false,
-                            UserName = "dev"
-                        });
                 });
 
             modelBuilder.Entity("Core.Entities.Workspace", b =>
@@ -342,12 +289,12 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Workspaces");
                 });
@@ -463,9 +410,13 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Core.Entities.Workspace", b =>
                 {
-                    b.HasOne("Core.Entities.User", null)
+                    b.HasOne("Core.Entities.User", "Owner")
                         .WithMany("OwnedWorkspaces")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Core.Entities.WorkspacePermission", b =>

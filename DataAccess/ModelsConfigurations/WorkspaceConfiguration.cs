@@ -10,9 +10,5 @@ public class WorkspaceConfiguration : IEntityTypeConfiguration<Workspace>
     {
         builder.HasKey(w => w.Id);
         builder.Property(w => w.Name).IsRequired();
-        builder.HasOne(w => w.Owner)
-            .WithMany(u => u.OwnedWorkspaces)
-            .HasForeignKey(w => w.OwnerId);
-        
     }
 }

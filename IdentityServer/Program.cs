@@ -1,4 +1,5 @@
 using IdentityServer;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseIdentityServer();
 
 app.MapControllers();
 

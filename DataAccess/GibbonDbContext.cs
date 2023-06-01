@@ -21,5 +21,7 @@ public class GibbonDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
+        modelBuilder.SeedRoles();
+        modelBuilder.SeedAdmin();    
     }
 }
