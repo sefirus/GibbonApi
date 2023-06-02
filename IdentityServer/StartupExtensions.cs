@@ -7,7 +7,6 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace IdentityServer;
 
 public static class StartupExtensions

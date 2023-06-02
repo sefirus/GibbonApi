@@ -9,13 +9,20 @@ public static class Seed
 {
     public static void SeedRoles(this ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Role>().HasData(new[]
+        modelBuilder.Entity<IdentityRole<Guid>>().HasData(new[]
         {
-            new Role() {Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), Name = RolesEnum.SuperUser},
-            new Role() {Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), Name = RolesEnum.RegularUser},
-            new Role() {Id = Guid.Parse("00000000-0000-0000-0000-000000000011"), Name = RolesEnum.Owner},
-            new Role() {Id = Guid.Parse("00000000-0000-0000-0000-000000000012"), Name = RolesEnum.Admin},
-            new Role() {Id = Guid.Parse("00000000-0000-0000-0000-000000000013"), Name = RolesEnum.RegularUser},
+            new IdentityRole<Guid>() {Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), Name = "SuperUser", NormalizedName = RolesEnum.SuperUser.ToUpper()},
+            new IdentityRole<Guid>() {Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), Name = "RegularUser", NormalizedName = RolesEnum.RegularUser.ToUpper()}
+        });
+    }
+    
+    public static void SeedWorkspaceRoles(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<WorkspaceRole>().HasData(new[]
+        {
+            new WorkspaceRole() {Id = Guid.Parse("00000000-0000-0000-0000-000000000011"), Name = RolesEnum.Owner},
+            new WorkspaceRole() {Id = Guid.Parse("00000000-0000-0000-0000-000000000012"), Name = RolesEnum.Admin},
+            new WorkspaceRole() {Id = Guid.Parse("00000000-0000-0000-0000-000000000013"), Name = RolesEnum.General},
         });
     }
 
@@ -40,5 +47,10 @@ public static class Seed
         // seed admin
         modelBuilder.Entity<User>().HasData(admin);
         // assign applicationRole role 
+        modelBuilder.Entity<IdentityUserRole<Guid>>().HasData(new IdentityUserRole<Guid>()
+        {
+            RoleId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+            UserId = Guid.Parse("00000000-0000-0000-0000-000000000001")
+        });
     }
 }

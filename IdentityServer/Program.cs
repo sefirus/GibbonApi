@@ -1,12 +1,8 @@
 using IdentityServer;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var config = builder.Configuration;
 builder.Services.AddServices(config);
@@ -22,12 +18,6 @@ builder.Services.AddCors(corsOptions =>
 );
 
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 app.UseHttpsRedirection();
 

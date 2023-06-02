@@ -21,5 +21,5 @@ public static class RolesEnum
     /// <summary>
     /// Permissions to read-write operations on the Workspace
     /// </summary>
-    public static string Regular = "Regular";
+    public static string General = "General";
 }

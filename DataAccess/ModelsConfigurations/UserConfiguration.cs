@@ -10,8 +10,5 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Email).IsRequired();
-        builder.HasOne(u => u.ApplicationRole)
-            .WithMany()
-            .HasForeignKey(u => u.ApplicationRoleId);
     }
 }
