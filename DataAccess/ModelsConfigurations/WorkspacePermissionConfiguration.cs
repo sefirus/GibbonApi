@@ -9,7 +9,7 @@ public class WorkspacePermissionConfiguration : IEntityTypeConfiguration<Workspa
     public void Configure(EntityTypeBuilder<WorkspacePermission> builder)
     {
         builder.HasKey(wp => wp.Id);
-        builder.HasOne(wp => wp.Role)
+        builder.HasOne(wp => wp.WorkspaceRole)
             .WithMany()
             .HasForeignKey(wp => wp.RoleId);
         builder.HasOne(wp => wp.User)

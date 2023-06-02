@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{A90C8328-AD6C-4C28-BC5E-154117D0CE51}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{C7AE101F-E289-43A9-A0FA-52256853BB2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{A2CC98C7-8878-4575-96C3-277E46D4B599}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{A90C8328-AD6C-4C28-BC5E-154117D0CE51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A90C8328-AD6C-4C28-BC5E-154117D0CE51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A90C8328-AD6C-4C28-BC5E-154117D0CE51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7AE101F-E289-43A9-A0FA-52256853BB2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7AE101F-E289-43A9-A0FA-52256853BB2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7AE101F-E289-43A9-A0FA-52256853BB2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7AE101F-E289-43A9-A0FA-52256853BB2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2CC98C7-8878-4575-96C3-277E46D4B599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2CC98C7-8878-4575-96C3-277E46D4B599}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2CC98C7-8878-4575-96C3-277E46D4B599}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2CC98C7-8878-4575-96C3-277E46D4B599}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
