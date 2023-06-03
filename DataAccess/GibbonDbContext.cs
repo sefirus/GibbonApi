@@ -10,7 +10,7 @@ namespace DataAccess;
 public class GibbonDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
     public DbSet<Workspace> Workspaces { get; set; }
-    public DbSet<WorkspaceRole> Roles { get; set; }
+    public DbSet<WorkspaceRole> WorkspaceRoles { get; set; }
     public DbSet<WorkspacePermission> WorkspacePermissions { get; set; }
     public DbSet<DataType> DataTypes { get; set; }
     public DbSet<SchemaObject> SchemaObjects { get; set; }
