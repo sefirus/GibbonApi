@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Interfaces;
 using DataAccess.ModelsConfigurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -26,5 +27,35 @@ public class GibbonDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
         modelBuilder.SeedRoles();
         modelBuilder.SeedWorkspaceRoles();
         modelBuilder.SeedAdmin();
+    }
+    
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker
+            .Entries()
+            .Where(e => e is
+            {
+                Entity: ICreatableEntity, 
+                State: EntityState.Added or EntityState.Modified
+            });
+
+        foreach (var entityEntry in entries)
+        {
+            var creatableEntry = (ICreatableEntity)entityEntry.Entity; 
+            creatableEntry.ModifiedDate = DateTime.UtcNow;
+
+            if (entityEntry.State != EntityState.Added)
+            {
+                continue;
+            }
+            
+            if (creatableEntry.Id == default)
+            {
+                creatableEntry.Id = Guid.NewGuid();
+            }
+            creatableEntry.CreatedDate = DateTime.UtcNow;
+        }
+
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }
