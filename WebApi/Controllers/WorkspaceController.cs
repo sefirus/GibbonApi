@@ -1,5 +1,6 @@
 ﻿using Core.Interfaces.Services;
 using Core.ViewModels.Workspace;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace WebApi.Controllers;
 
@@ -15,6 +16,7 @@ public class WorkspaceController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ReadWorkspaceShortViewModel> CreateWorkspace(CreateWorkspaceViewModel model)
     {
         var workspace = await _workspaceService.CreateWorkspaceAsync(model.Name, false); // isAiEnabled is set to false
@@ -26,5 +28,12 @@ public class WorkspaceController : ControllerBase
         };
 
         return readWorkspaceModel;
+    }
+    
+    [HttpPatch("{id}/rename")]
+    [Authorize]
+    public async Task RenameWorkspace(Guid id, RenameWorkspaceViewModel model)
+    {
+        await _workspaceService.RenameWorkspace(id, model.NewName);
     }
 }

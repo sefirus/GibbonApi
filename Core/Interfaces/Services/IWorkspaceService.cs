@@ -5,4 +5,5 @@ namespace Core.Interfaces.Services;
 public interface IWorkspaceService
 {
     Task<Workspace> CreateWorkspaceAsync(string name, bool isAiEnabled);
+    Task RenameWorkspace(Guid id, string newName);
 }

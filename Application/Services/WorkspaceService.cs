@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Enums;
+using Core.Exceptions;
 using Core.Interfaces.Services;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -54,5 +55,16 @@ public class WorkspaceService : IWorkspaceService
         await _context.SaveChangesAsync();
 
         return workspace;
+    }
+
+    public async Task RenameWorkspace(Guid id, string newName)
+    {
+        var modifiedCount = await _context.Workspaces
+            .Where(w => w.Id == id)
+            .UpdateFromQueryAsync(w => new Workspace { Name = newName, ModifiedDate = DateTime.UtcNow });
+        if (modifiedCount < 1)
+        {
+            throw new NotFoundException(nameof(Workspace));
+        }
     }
 }
