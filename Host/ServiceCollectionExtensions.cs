@@ -10,5 +10,6 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         services.AddTransient<ICurrentUserService, CurrentUserService>();
         services.AddTransient<IWorkspaceService, WorkspaceService>();
+        services.AddTransient<IUserService, UserService>();
     }
 }
