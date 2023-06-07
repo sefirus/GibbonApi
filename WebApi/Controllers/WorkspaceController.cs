@@ -30,10 +30,17 @@ public class WorkspaceController : ControllerBase
         return readWorkspaceModel;
     }
     
-    [HttpPatch("{id}/rename")]
     [Authorize]
-    public async Task RenameWorkspace(Guid id, RenameWorkspaceViewModel model)
+    [HttpPatch("{workspaceId:guid}/rename")]
+    public async Task RenameWorkspace(Guid workspaceId, RenameWorkspaceViewModel model)
     {
-        await _workspaceService.RenameWorkspace(id, model.NewName);
+        await _workspaceService.RenameWorkspace(workspaceId, model.NewName);
+    }
+
+    [Authorize]
+    [HttpPut("{workspaceId:guid}/assign-permission")]
+    public async Task AssignWorkspacePermission(Guid workspaceId, AssignPermissionViewModel permissionViewModel)
+    {
+        await _workspaceService.AssignPermission(workspaceId, permissionViewModel);
     }
 }
