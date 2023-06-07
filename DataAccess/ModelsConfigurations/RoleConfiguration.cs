@@ -10,5 +10,6 @@ public class RoleConfiguration : IEntityTypeConfiguration<WorkspaceRole>
     {
         builder.HasKey(r => r.Id);
         builder.Property(r => r.Name).IsRequired();
+        builder.ToTable("WorkspaceRoles");
     }
 }

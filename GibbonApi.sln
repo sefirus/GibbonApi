@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{A2CC98C7-8878-4575-96C3-277E46D4B599}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{4CB61045-D41C-4288-BC98-11148D6A9698}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{A2CC98C7-8878-4575-96C3-277E46D4B599}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2CC98C7-8878-4575-96C3-277E46D4B599}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2CC98C7-8878-4575-96C3-277E46D4B599}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CB61045-D41C-4288-BC98-11148D6A9698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CB61045-D41C-4288-BC98-11148D6A9698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CB61045-D41C-4288-BC98-11148D6A9698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CB61045-D41C-4288-BC98-11148D6A9698}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
