@@ -84,7 +84,7 @@ public static class StartupExtensions
                 AllowOfflineAccess = true, // enable refresh tokens
                 RefreshTokenUsage = TokenUsage.OneTimeOnly,
                 ClientSecrets = {new Secret("tests_client_secret".ToSha256())},
-                AccessTokenLifetime = 600,
+                AccessTokenLifetime = 6000,
             }
         };
 }
