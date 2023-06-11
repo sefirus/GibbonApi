@@ -5,21 +5,21 @@ public static class RolesEnum
     /// <summary>
     /// God-alike role for dev team
     /// </summary>
-    public static string SuperUser = "SuperUser";
+    public const string SuperUser = "SuperUser";
     /// <summary>
     /// Regular clients
     /// </summary>
-    public static string RegularUser = "RegularUser";
+    public const string RegularUser = "RegularUser";
     /// <summary>
     /// Permissions to delete workspace 
     /// </summary>
-    public static string Owner = "Owner";
+    public const string Owner = "Owner";
     /// <summary>
     /// Permissions to schema modifying and generating data on the Workspace
     /// </summary>
-    public static string Admin = "Admin";
+    public const string Admin = "Admin";
     /// <summary>
     /// Permissions to read-write operations on the Workspace
     /// </summary>
-    public static string General = "General";
+    public const string General = "General";
 }

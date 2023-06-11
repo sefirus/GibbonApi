@@ -1,4 +1,5 @@
-﻿using Core.Interfaces.Services;
+﻿using Core.Enums;
+using Core.Interfaces.Services;
 using Core.ViewModels.Workspace;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,14 +31,14 @@ public class WorkspaceController : ControllerBase
         return readWorkspaceModel;
     }
     
-    [Authorize]
+    [Authorize(Roles = AccessLevels.AdminAccess)]
     [HttpPatch("{workspaceId:guid}/rename")]
     public async Task RenameWorkspace(Guid workspaceId, RenameWorkspaceViewModel model)
     {
         await _workspaceService.RenameWorkspace(workspaceId, model.NewName);
     }
 
-    [Authorize]
+    [Authorize(Roles = AccessLevels.OwnerAccess)]
     [HttpPut("{workspaceId:guid}/assign-permission")]
     public async Task AssignWorkspacePermission(Guid workspaceId, AssignPermissionViewModel permissionViewModel)
     {

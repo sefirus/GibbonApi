@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DataAccess;
 using Host;
 using Host.Middleware;
@@ -47,14 +48,51 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        // base-address of your identityserver
         options.Authority = "https://localhost:7030";
-
-        // if you are using API resources, you can specify the name here
         options.Audience = "GibbonApi";
-
-        // IdentityServer emits a typ header by default, recommended extra check
         options.TokenValidationParameters.ValidTypes = new[] { "at+jwt" };
+        options.Events = new JwtBearerEvents()
+        {
+            OnTokenValidated = async context =>
+            {
+                var dbContext = context.HttpContext.RequestServices.GetRequiredService<GibbonDbContext>();
+
+                var routeData = context.HttpContext.GetRouteData();
+                var workspaceIdRouteDate = routeData?.Values["workspaceId"];
+
+                if (workspaceIdRouteDate == null 
+                    || !Guid.TryParse(workspaceIdRouteDate.ToString(), out var workspaceId))
+                {
+                    return;
+                }
+                var userIdClaim = context.Principal.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return;
+                }
+
+                if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                {
+                   return; 
+                }
+                
+                var userPermissionOnWorkspace = await dbContext.WorkspacePermissions
+                    .Where(wp => wp.UserId == userId
+                                 && wp.WorkspaceId == workspaceId)
+                    .Select(wp => wp.WorkspaceRole.Name)
+                    .FirstOrDefaultAsync();
+                if (userPermissionOnWorkspace == null)
+                {
+                    context.Fail("Unauthorized");
+                    return;
+                }
+
+                var workspaceRoleClaim = new Claim(ClaimTypes.Role, userPermissionOnWorkspace);
+
+                ((ClaimsIdentity)context.Principal.Identity).AddClaims(new[] { workspaceRoleClaim });
+            }
+        };
+
     });
 
 builder.Services.AddDbContext<GibbonDbContext>(options =>
