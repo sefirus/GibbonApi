@@ -10,5 +10,10 @@ public class DataTypeConfiguration : IEntityTypeConfiguration<DataType>
     {
         builder.HasKey(dt => dt.Id);
         builder.Property(dt => dt.Name).IsRequired();
+        builder
+            .HasOne(dt => dt.NestedType)
+            .WithMany()
+            .HasForeignKey(dt => dt.NestedTypeId)
+            .IsRequired(false);
     }
 }

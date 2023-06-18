@@ -27,6 +27,7 @@ public class GibbonDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
         modelBuilder.SeedRoles();
         modelBuilder.SeedWorkspaceRoles();
         modelBuilder.SeedAdmin();
+        modelBuilder.SeedDataTypes();
     }
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
