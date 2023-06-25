@@ -8,7 +8,9 @@ namespace WebApi.Controllers;
 public class SchemaController : ControllerBase
 {
     [HttpPost("{workspaceId:guid}")]
-    public async Task<IActionResult> CreateSchemaObject([FromRoute]Guid workspaceId, [FromBody]Dictionary<string, SchemaFieldViewModel> y)
+    public async Task<IActionResult> CreateSchemaObject(
+        [FromRoute]Guid workspaceId, 
+        [FromBody]Dictionary<string, SchemaFieldViewModel> objectViewModel)
     {
         return Ok();
     }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace Core.Enums;
+﻿namespace Core.Enums;
 
 public static class DataTypesEnum
 {
@@ -14,4 +12,41 @@ public static class DataTypesEnum
     /// DataType for array. Requires NestedType
     /// </summary>
     public const string Array = "Array";
+    
+    public static string? GetDataType(string argument)
+    {
+        var lowercaseArgument = argument.ToLower();
+
+        if (lowercaseArgument == Int.ToLower())
+            return Int;
+        if (lowercaseArgument == Float.ToLower())
+            return Float;
+        if (lowercaseArgument == ObjectId.ToLower())
+            return ObjectId;
+        if (lowercaseArgument == Uuid.ToLower())
+            return Uuid;
+        if (lowercaseArgument == Object.ToLower())
+            return Object;
+        if (lowercaseArgument == Array.ToLower())
+            return Array;
+
+        switch (lowercaseArgument)
+        {
+            case "integer" or "int":
+                return Int;
+            case "floating" or "flt" or "fltng":
+                return Float;
+            case "objid" or "id":
+                return ObjectId;
+            case "guid":
+                return Uuid;
+            case "obj":
+                return Object;
+            case "arr" or "array":
+                return Array;
+            default:
+                // No match found
+                return null;
+        }
+    }
 }
