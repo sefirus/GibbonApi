@@ -13,12 +13,14 @@ public static class DataTypesEnum
     /// </summary>
     public const string Array = "Array";
     
-    public static string? GetDataType(string argument)
+    public static string? GetDataType(string? argument)
     {
-        var lowercaseArgument = argument.ToLower();
+        var lowercaseArgument = argument?.ToLower();
 
         if (lowercaseArgument == Int.ToLower())
             return Int;
+        if (lowercaseArgument == String.ToLower())
+            return String;
         if (lowercaseArgument == Float.ToLower())
             return Float;
         if (lowercaseArgument == ObjectId.ToLower())
@@ -33,6 +35,8 @@ public static class DataTypesEnum
         switch (lowercaseArgument)
         {
             case "integer" or "int":
+                return Int;
+            case "str" or "char":
                 return Int;
             case "floating" or "flt" or "fltng":
                 return Float;
