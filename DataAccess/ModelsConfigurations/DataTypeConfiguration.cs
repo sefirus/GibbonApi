@@ -15,5 +15,6 @@ public class DataTypeConfiguration : IEntityTypeConfiguration<DataType>
             .WithMany()
             .HasForeignKey(dt => dt.NestedTypeId)
             .IsRequired(false);
+        builder.Ignore(dt => dt.NestedTypeName);
     }
 }

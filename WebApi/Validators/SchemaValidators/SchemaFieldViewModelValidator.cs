@@ -79,13 +79,13 @@ public class SchemaFieldViewModelValidator : AbstractValidator<SchemaFieldViewMo
             
         //Validation for Pattern field
         RuleFor(x => x.Pattern)
-            .Must(pattern => IsValidRegex(pattern))
+            .Must(IsValidRegex)
             .When(x => !string.IsNullOrEmpty(x.Pattern) 
                        && DataTypesEnum.GetDataType(x.Type) == DataTypesEnum.String)
             .WithMessage("Pattern must be a valid regex");
     }
     
-    private bool IsValidRegex(string pattern)
+    private bool IsValidRegex(string? pattern)
     {
         try
         {

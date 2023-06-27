@@ -1,4 +1,7 @@
-﻿namespace Core.Enums;
+﻿using Core.Entities;
+using Core.ViewModels.Schema;
+
+namespace Core.Enums;
 
 public static class DataTypesEnum
 {
@@ -52,5 +55,34 @@ public static class DataTypesEnum
                 // No match found
                 return null;
         }
+    }
+
+    public static readonly List<DataType> DataTypes = new()
+    {
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), Name = String,  },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), Name = Int,  },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000003"), Name = Float,  },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"), Name = ObjectId,  },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000005"), Name = Uuid,  },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000006"), Name = Object,  },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000007"), Name = Array, NestedTypeId = Guid.Parse("00000000-0000-0000-0000-000000000001"), NestedTypeName = String},
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000008"), Name = Array, NestedTypeId = Guid.Parse("00000000-0000-0000-0000-000000000002"), NestedTypeName = Int},
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000009"), Name = Array, NestedTypeId = Guid.Parse("00000000-0000-0000-0000-000000000003"), NestedTypeName = Float},
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000010"), Name = Array, NestedTypeId = Guid.Parse("00000000-0000-0000-0000-000000000004"), NestedTypeName = ObjectId},
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000011"), Name = Array, NestedTypeId = Guid.Parse("00000000-0000-0000-0000-000000000005"), NestedTypeName = Uuid},
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000012"), Name = Array, NestedTypeId = Guid.Parse("00000000-0000-0000-0000-000000000006"), NestedTypeName = Object},
+
+    };
+
+    public static DataType GetDataTypeObject(SchemaFieldViewModel fieldViewModel)
+    {
+        var parentType = GetDataType(fieldViewModel.Type)!;
+        if (parentType != Array)
+        {
+            return DataTypes.Single(dt => dt.Name == parentType);
+        }
+
+        var nestedType = GetDataType(fieldViewModel.ArrayElement?.Type)!;
+        return DataTypes.Single(dt => dt.Name == Array && dt.NestedTypeName == nestedType);
     }
 }
