@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Application.Services;
+using Core.Entities;
 using Core.Interfaces.Services;
 using DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ICurrentUserService, CurrentUserService>();
         services.AddTransient<IWorkspaceService, WorkspaceService>();
         services.AddTransient<IUserService, UserService>();
+        services.AddTransient<ISchemaService, SchemaService>();
     }
 
     public static void ConfigureSwagger(this IServiceCollection services)

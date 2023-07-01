@@ -19,7 +19,7 @@ public class SchemaService : ISchemaService
     public async Task CreateWorkspaceObject(Guid workspaceId, string name, Dictionary<string, SchemaFieldViewModel> viewModel)
     {
         var workspace = await _context.Workspaces.SingleAsync(w => w.Id == workspaceId);
-        var field = new List<SchemaField>();
+        var fields = new List<SchemaField>();
         
         var newSchemaObject = new SchemaObject()
         {
@@ -27,10 +27,8 @@ public class SchemaService : ISchemaService
             Name = name
         };
 
-        foreach (var keyValue in viewModel)
+        foreach (var (fieldName, fieldModel) in viewModel)
         {
-            var fieldName = keyValue.Key;
-            var fieldModel = keyValue.Value;
             var dataType = DataTypesEnum.GetDataTypeObject(fieldModel);
         }
     }

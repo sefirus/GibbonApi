@@ -15,6 +15,7 @@ public class SchemaObjectFieldValidator : AbstractValidator<KeyValuePair<string,
     {
         return char.IsLetterOrDigit(c) || c == '_';
     }
+    
     public SchemaObjectFieldValidator()
     {
         RuleFor(kp => kp.Key)

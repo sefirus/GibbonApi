@@ -29,14 +29,12 @@ public class SchemaFieldViewModelValidator : AbstractValidator<SchemaFieldViewMo
     {
         Depth = maxDepth;
         
-        //Validation for Type field
         RuleFor(x => x.Type)
             .NotEmpty()
             .WithMessage("Type field is required.")
             .Must(type => DataTypesEnum.GetDataType(type) != null)
             .WithMessage("Invalid data type");
 
-        //Validation for Min and Max fields
         RuleFor(x => x.Min)
             .LessThanOrEqualTo(x => x.Max)
             .When(x => DataTypesEnum.GetDataType(x.Type) == DataTypesEnum.Float 
@@ -49,13 +47,11 @@ public class SchemaFieldViewModelValidator : AbstractValidator<SchemaFieldViewMo
                        || DataTypesEnum.GetDataType(x.Type) == DataTypesEnum.Int)
             .WithMessage("Max value should be greater than or equal to min value");
 
-        //Validation for Length field
         RuleFor(x => x.Length)
             .GreaterThan(0)
             .When(x => DataTypesEnum.GetDataType(x.Type) == DataTypesEnum.String)
             .WithMessage("Length should be greater than zero for string type");
             
-        //Validation for ArrayElement field
         RuleFor(x => x.ArrayElement)
             .Must(BeValidChildItem)
             .When(x => DataTypesEnum.GetDataType(x.Type) == DataTypesEnum.Array)
@@ -66,23 +62,47 @@ public class SchemaFieldViewModelValidator : AbstractValidator<SchemaFieldViewMo
             .When(x => DataTypesEnum.GetDataType(x.Type) != DataTypesEnum.Array)
             .WithMessage("ArrayElement must be null for non-array types");
 
-        //Validation for IsPrimaryKey field
         RuleFor(x => x.IsPrimaryKey)
             .NotNull()
             .WithMessage("IsPrimaryKey field is required.");
             
-        //Validation for Summary field
         RuleFor(x => x.Summary)
             .MaximumLength(500)
             .When(x => !string.IsNullOrEmpty(x.Summary))
             .WithMessage("Summary can't exceed 500 characters");
             
-        //Validation for Pattern field
         RuleFor(x => x.Pattern)
             .Must(IsValidRegex)
             .When(x => !string.IsNullOrEmpty(x.Pattern) 
                        && DataTypesEnum.GetDataType(x.Type) == DataTypesEnum.String)
             .WithMessage("Pattern must be a valid regex");
+        
+        RuleFor(x => x.Fields)
+            .Must(fields => fields.All(BeValidChildItem))
+            .When(x => x.Fields != null && DataTypesEnum.GetDataType(x.Type) == DataTypesEnum.Object)
+            .WithMessage("Fields must follow the same validation rules as a SchemaFieldViewModel.");
+
+        RuleFor(x => x.Fields)
+            .Must(fields => fields.All(field => field.IsPrimaryKey == false))
+            .When(x => x.Fields != null)
+            .WithMessage("No field in Fields can have IsPrimaryKey set to true.");
+
+        RuleFor(x => x.Fields)
+            .Null()
+            .When(x => DataTypesEnum.GetDataType(x.Type) != DataTypesEnum.Object)
+            .WithMessage("Fields must be null for non-Object types.");
+        
+        RuleFor(x => x.Fields)
+            .NotNull()
+            .When(x => DataTypesEnum.GetDataType(x.Type) == DataTypesEnum.Object && Depth < 3)
+            .WithMessage("Fields must be not null for Object types, unless at max depth.")
+            .Must(BeUniqueFieldName)
+            .WithMessage("FieldName must be unique among all fields of the object");
+
+        RuleFor(x => x.ArrayElement)
+            .Null()
+            .When(x => x.Fields != null)
+            .WithMessage("ArrayElement and Fields cannot be both populated. It's either an array or an object, but not both.");
     }
     
     private bool IsValidRegex(string? pattern)
@@ -96,5 +116,23 @@ public class SchemaFieldViewModelValidator : AbstractValidator<SchemaFieldViewMo
         {
             return false;
         }
+    }
+    
+    private static bool BeUniqueFieldName(List<SchemaFieldViewModel>? fields)
+    {
+        if (fields == null)
+        {
+            return true;
+        }
+
+        var fieldNames = new HashSet<string>();
+        foreach (var field in fields)
+        {
+            if (field.FieldName is null || !fieldNames.Add(field.FieldName))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }
