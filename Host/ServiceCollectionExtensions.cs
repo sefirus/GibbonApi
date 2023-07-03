@@ -1,7 +1,10 @@
 ﻿using System.Security.Claims;
+using Application.Mappers;
 using Application.Services;
 using Core.Entities;
+using Core.Interfaces;
 using Core.Interfaces.Services;
+using Core.ViewModels.Schema;
 using DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +21,11 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IWorkspaceService, WorkspaceService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ISchemaService, SchemaService>();
+    }
+
+    public static void AddApplicationMappers(this IServiceCollection services)
+    {
+        services.AddTransient<IVmMapper<Dictionary<string, SchemaFieldViewModel>, List<SchemaField>>, SchemaObjectFieldsMapper>();
     }
 
     public static void ConfigureSwagger(this IServiceCollection services)

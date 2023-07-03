@@ -13,6 +13,7 @@ IdentityModelEventSource.ShowPII = true; //Add this line
 
 // Add services to the container.
 builder.Services.AddApplicationServices();
+builder.Services.AddApplicationMappers();
 builder.Services
     .AddControllers()
     .AddApplicationPart(typeof(WorkspaceController).Assembly);
