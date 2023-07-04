@@ -27,9 +27,35 @@ public class SchemaService : ISchemaService
         var newSchemaObject = new SchemaObject()
         {
             Id = Guid.NewGuid(),
-            Name = name
+            Name = name,
+            WorkspaceId = workspaceId,
+            Workspace = workspace
         };
+        
+        _context.SchemaObjects.Add(newSchemaObject);
 
         var fields = _schemaFieldsMapper.Map(viewModel);
+
+        foreach (var field in fields)
+        {
+            AddFieldAndChildrenToContext(field, newSchemaObject);
+        }
+
+        await _context.SaveChangesAsync();
+
+    }
+    
+    private void AddFieldAndChildrenToContext(SchemaField field, SchemaObject schemaObject)
+    {
+        field.SchemaObjectId = schemaObject.Id;
+        field.SchemaObject = schemaObject;
+        _context.SchemaFields.Add(field);
+
+        // Process child fields
+        if (field.ChildFields == null) return;
+        foreach (var childField in field.ChildFields)
+        {
+            AddFieldAndChildrenToContext(childField, schemaObject);
+        }
     }
 }

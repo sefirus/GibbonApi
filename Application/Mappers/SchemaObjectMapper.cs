@@ -2,6 +2,7 @@
 using Core.Enums;
 using Core.Interfaces;
 using Core.ViewModels.Schema;
+using Newtonsoft.Json;
 
 namespace Application.Mappers;
 
@@ -19,8 +20,8 @@ public class SchemaObjectFieldsMapper : IVmMapper<Dictionary<string, SchemaField
                 FieldName = key,
                 IsPrimaryKey = schemaFieldViewModel.IsPrimaryKey,
                 DataTypeId = dataType.Id,
-                DataType = dataType,
-                IsArray = DataTypesEnum.GetDataType(schemaFieldViewModel.Type) == DataTypesEnum.Array
+                IsArray = DataTypesEnum.GetDataType(schemaFieldViewModel.Type) == DataTypesEnum.Array,
+                ValidatorJson = CreateValidatorJson(schemaFieldViewModel)
             };
 
             if (schemaFieldViewModel.ArrayElement != null)
@@ -40,5 +41,28 @@ public class SchemaObjectFieldsMapper : IVmMapper<Dictionary<string, SchemaField
         }
 
         return result;
+    }
+    
+    private string CreateValidatorJson(SchemaFieldViewModel viewModel)
+    {
+        var dict = new Dictionary<string, object>();
+
+        if (DataTypesEnum.GetDataType(viewModel.Type) == DataTypesEnum.String)
+        {
+            if (!string.IsNullOrEmpty(viewModel.Pattern))
+            {
+                dict["Pattern"] = viewModel.Pattern;
+            }
+
+            dict["Length"] = viewModel.Length;
+        }
+
+        if (DataTypesEnum.GetDataType(viewModel.Type) == DataTypesEnum.Int || DataTypesEnum.GetDataType(viewModel.Type) == DataTypesEnum.Float)
+        {
+            dict["Min"] = viewModel.Min;
+            dict["Max"] = viewModel.Max;
+        }
+
+        return JsonConvert.SerializeObject(dict);
     }
 }
