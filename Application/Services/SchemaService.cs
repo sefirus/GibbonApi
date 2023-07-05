@@ -58,4 +58,16 @@ public class SchemaService : ISchemaService
             AddFieldAndChildrenToContext(childField, schemaObject);
         }
     }
+
+    public async Task<SchemaObject> GetSchemaObject(Guid schemaObjectId)
+    {
+        var schemaObject = await _context.SchemaObjects
+            .AsSplitQuery()
+            .AsNoTracking()
+            .Include(s => s.Fields)
+                .ThenInclude(f => f.ChildFields)
+                    .ThenInclude(chf => chf.ChildFields)
+            .SingleAsync(s => s.Id == schemaObjectId);
+        return schemaObject;
+    }
 }

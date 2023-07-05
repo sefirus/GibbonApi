@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
     public static void AddApplicationMappers(this IServiceCollection services)
     {
         services.AddTransient<IVmMapper<Dictionary<string, SchemaFieldViewModel>, List<SchemaField>>, SchemaObjectFieldsMapper>();
+        services.AddTransient<IVmMapper<SchemaObject, SchemaObjectViewModel>, SchemaObjectToVmMapper>();
     }
 
     public static void ConfigureSwagger(this IServiceCollection services)
