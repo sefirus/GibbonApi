@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using DataAccess;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -16,7 +17,8 @@ builder.Services.AddApplicationServices();
 builder.Services.AddApplicationMappers();
 builder.Services
     .AddControllers()
-    .AddApplicationPart(typeof(WorkspaceController).Assembly);
+    .AddApplicationPart(typeof(WorkspaceController).Assembly)
+    .AddJsonOptions(options => options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
 builder.Services.ConfigureSwagger();
 builder.Services.ConfigureWorkspacePermissionsAuth();
 builder.Services.AddFluentValidationAutoValidation();

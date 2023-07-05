@@ -14,12 +14,12 @@ public class SchemaObjectToVmMapper : IVmMapper<SchemaObject, SchemaObjectViewMo
             Id = source.Id,
             WorkspaceId = source.WorkspaceId,
             Name = source.Name,
-            Fields = MapFields(source.Fields)
+            Fields = MapFields(source.Fields.Where(sf => sf.ParentFieldId is null))
         };
         return viewModel;
     }
     
-    private Dictionary<string, SchemaFieldViewModel> MapFields(List<SchemaField> schemaFields)
+    private Dictionary<string, SchemaFieldViewModel> MapFields(IEnumerable<SchemaField> schemaFields)
     {
         var result = new Dictionary<string, SchemaFieldViewModel>();
 
@@ -28,7 +28,7 @@ public class SchemaObjectToVmMapper : IVmMapper<SchemaObject, SchemaObjectViewMo
             var fieldViewModel = new SchemaFieldViewModel
             {
                 FieldName = schemaField.FieldName,
-                Type = schemaField.DataType.Name,
+                Type = DataTypesEnum.GetDataTypeObjectById(schemaField.DataTypeId).Name,
                 Min = schemaField.Min,
                 Max = schemaField.Max,
                 Length = schemaField.Length,
@@ -43,7 +43,7 @@ public class SchemaObjectToVmMapper : IVmMapper<SchemaObject, SchemaObjectViewMo
                 fieldViewModel.ArrayElement = MapFields(schemaField.ChildFields).Values.First();
             }
             
-            if (schemaField.DataType.Name == DataTypesEnum.Object && schemaField.ChildFields != null)
+            if (DataTypesEnum.GetDataTypeObjectById(schemaField.DataTypeId).Name == DataTypesEnum.Object && schemaField.ChildFields != null)
             {
                 fieldViewModel.Fields = MapFields(schemaField.ChildFields).Values.ToList();
             }

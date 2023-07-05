@@ -85,4 +85,9 @@ public static class DataTypesEnum
         var nestedType = GetDataType(fieldViewModel.ArrayElement?.Type)!;
         return DataTypes.Single(dt => dt.Name == Array && dt.NestedTypeName == nestedType);
     }
+
+    public static DataType GetDataTypeObjectById(Guid id)
+    {
+        return DataTypes.Single(dt => dt.Id == id);
+    }
 }
