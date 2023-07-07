@@ -3,6 +3,7 @@ using System;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(GibbonDbContext))]
-    partial class GibbonDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230618075619_AddNestedDataType")]
+    partial class AddNestedDataType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,90 +54,90 @@ namespace DataAccess.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5564),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5567),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2724),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2727),
                             Name = "String"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000002"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5572),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5572),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2732),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2732),
                             Name = "Int"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000003"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5668),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5668),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2736),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2737),
                             Name = "Float"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000004"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5671),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5672),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2739),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2739),
                             Name = "ObjectId"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000005"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5673),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5673),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2741),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2742),
                             Name = "Uuid"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000006"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5680),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5680),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2752),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2752),
                             Name = "Object"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000007"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5709),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5709),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2780),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2780),
                             Name = "Array",
                             NestedTypeId = new Guid("00000000-0000-0000-0000-000000000001")
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000008"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5712),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5712),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2784),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2784),
                             Name = "Array",
                             NestedTypeId = new Guid("00000000-0000-0000-0000-000000000002")
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000009"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5714),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5714),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2786),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2787),
                             Name = "Array",
                             NestedTypeId = new Guid("00000000-0000-0000-0000-000000000003")
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000010"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5716),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5717),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2789),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2789),
                             Name = "Array",
                             NestedTypeId = new Guid("00000000-0000-0000-0000-000000000004")
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000011"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5718),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5719),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2792),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2792),
                             Name = "Array",
                             NestedTypeId = new Guid("00000000-0000-0000-0000-000000000005")
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000012"),
-                            CreatedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5721),
-                            ModifiedDate = new DateTime(2023, 7, 5, 19, 38, 55, 330, DateTimeKind.Utc).AddTicks(5721),
+                            CreatedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2795),
+                            ModifiedDate = new DateTime(2023, 6, 18, 7, 56, 19, 328, DateTimeKind.Utc).AddTicks(2795),
                             Name = "Array",
                             NestedTypeId = new Guid("00000000-0000-0000-0000-000000000006")
                         });
@@ -196,28 +199,17 @@ namespace DataAccess.Migrations
                     b.Property<bool>("IsPrimaryKey")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("Length")
-                        .HasColumnType("integer");
-
-                    b.Property<double?>("Max")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("Min")
-                        .HasColumnType("double precision");
-
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("ParentFieldId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Pattern")
-                        .HasColumnType("text");
-
                     b.Property<Guid>("SchemaObjectId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Summary")
+                    b.Property<string>("ValidatorJson")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -365,7 +357,7 @@ namespace DataAccess.Migrations
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             AccessFailedCount = 0,
                             ApplicationRoleId = new Guid("00000000-0000-0000-0000-000000000001"),
-                            ConcurrencyStamp = "b4671767-51dc-4d11-bb91-1de7cbbcc45b",
+                            ConcurrencyStamp = "a06f906d-d7ee-47cd-82e3-24bc27fef8fd",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "dev@email.com",
                             EmailConfirmed = false,
@@ -374,10 +366,10 @@ namespace DataAccess.Migrations
                             ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             NormalizedEmail = "DEV@EMAIL.COM",
                             NormalizedUserName = "DEV",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKgZyn4ZTiXTkAHpaElp9S228fu/e3LxSBAK5jZ5lvzILXPuFEWSepbElXQEl33now==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHNoZfjRDgSYf9VLHbqNXA6fzOV6HMmqdHHSjfLnkAhUWKkuRlBVwqWglux1rLoQWA==",
                             PhoneNumber = "00 000 000 0000",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f6aef1d4-2b75-4019-9abe-ebb0eca010e5",
+                            SecurityStamp = "bf4953f1-58b4-4b7f-974c-5f87e7524bab",
                             TwoFactorEnabled = false,
                             UserName = "dev"
                         });
