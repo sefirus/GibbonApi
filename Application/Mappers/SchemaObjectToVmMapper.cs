@@ -41,6 +41,7 @@ public class SchemaObjectToVmMapper : IVmMapper<SchemaObject, SchemaObjectViewMo
             {
                 fieldViewModel.Type = DataTypesEnum.Array;
                 fieldViewModel.ArrayElement = MapFields(schemaField.ChildFields).Values.First();
+                fieldViewModel.ArrayElement.FieldName = default;
             }
             
             if (DataTypesEnum.GetDataTypeObjectById(schemaField.DataTypeId).Name == DataTypesEnum.Object && schemaField.ChildFields != null)

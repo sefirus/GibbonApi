@@ -1,7 +1,9 @@
 ﻿using Core.Entities;
+using Core.Enums;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.ViewModels.Schema;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
@@ -21,15 +23,15 @@ public class SchemaController : ControllerBase
         _schemaObjectViewModelMapper = schemaObjectViewModelMapper;
     }
 
-    [HttpGet("{schemaObjectId:guid}")]
-    public async Task<SchemaObjectViewModel> GetSchemaObject(Guid schemaObjectId)
+    [HttpGet("{workspaceId:guid}")]
+    public async Task<SchemaObjectViewModel> GetSchemaObject([FromRoute]Guid workspaceId, [FromQuery]string schemaObjectName)
     {
-        var obj = await _schemaService.GetSchemaObject(schemaObjectId);
+        var obj = await _schemaService.GetSchemaObject(workspaceId, schemaObjectName);
         var viewModel = _schemaObjectViewModelMapper.Map(obj);
         return viewModel;
     }
 
-
+    [Authorize(Roles = AccessLevels.AdminAccess)]
     [HttpPost("{workspaceId:guid}/{objectName}")]
     public async Task<IActionResult> CreateSchemaObject(
         [FromRoute]Guid workspaceId, 

@@ -59,15 +59,16 @@ public class SchemaService : ISchemaService
         }
     }
 
-    public async Task<SchemaObject> GetSchemaObject(Guid schemaObjectId)
+    public async Task<SchemaObject> GetSchemaObject(Guid workspaceId, string schemaObjectName)
     {
         var schemaObject = await _context.SchemaObjects
             .AsSplitQuery()
             .AsNoTracking()
             .Include(s => s.Fields)
-                .ThenInclude(f => f.ChildFields)
+                .ThenInclude(f => f.ChildFields!)
                     .ThenInclude(chf => chf.ChildFields)
-            .SingleAsync(s => s.Id == schemaObjectId);
+            .SingleAsync(s => s.WorkspaceId == workspaceId 
+                && s.Name.ToLower() == schemaObjectName.ToLower());
         return schemaObject;
     }
 }
