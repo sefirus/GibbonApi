@@ -86,6 +86,16 @@ public static class DataTypesEnum
         return DataTypes.Single(dt => dt.Name == Array && dt.NestedTypeName == nestedType);
     }
 
+    public static DataType GetDataTypeObject(string? argument)
+    {
+        var parentType = GetDataType(argument)!;
+        if (parentType != Array)
+        {
+            return DataTypes.Single(dt => dt.Name == parentType);
+        }
+
+        throw new InvalidOperationException();
+    }
     public static DataType GetDataTypeObjectById(Guid id)
     {
         return DataTypes.Single(dt => dt.Id == id);
