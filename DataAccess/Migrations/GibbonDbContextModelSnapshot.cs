@@ -45,7 +45,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("NestedTypeId");
 
-                    b.ToTable("DataTypes");
+                    b.ToTable("DataTypes", (string)null);
 
                     b.HasData(
                         new
@@ -171,7 +171,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SchemaFieldId");
 
-                    b.ToTable("FieldValues");
+                    b.ToTable("FieldValues", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.SchemaField", b =>
@@ -228,7 +228,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SchemaObjectId");
 
-                    b.ToTable("SchemaFields");
+                    b.ToTable("SchemaFields", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.SchemaObject", b =>
@@ -257,7 +257,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("WorkspaceId");
 
-                    b.ToTable("SchemaObjects");
+                    b.ToTable("SchemaObjects", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.StoredDocument", b =>
@@ -279,7 +279,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SchemaObjectId");
 
-                    b.ToTable("StoredDocuments");
+                    b.ToTable("StoredDocuments", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.User", b =>
@@ -409,7 +409,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Workspaces");
+                    b.ToTable("Workspaces", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.WorkspacePermission", b =>
@@ -441,7 +441,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("WorkspaceId");
 
-                    b.ToTable("WorkspacePermissions");
+                    b.ToTable("WorkspacePermissions", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.WorkspaceRole", b =>

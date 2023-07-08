@@ -23,6 +23,7 @@ public class SchemaController : ControllerBase
         _schemaObjectViewModelMapper = schemaObjectViewModelMapper;
     }
 
+    [Authorize(Roles = AccessLevels.GeneralAccess)]
     [HttpGet("{workspaceId:guid}")]
     public async Task<SchemaObjectViewModel> GetSchemaObject([FromRoute]Guid workspaceId, [FromQuery]string schemaObjectName)
     {

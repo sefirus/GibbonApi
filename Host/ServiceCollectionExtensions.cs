@@ -9,6 +9,11 @@ using DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using NpgsqlTypes;
+using Serilog;
+using Serilog.Sinks.PostgreSQL;
+using Serilog.Sinks.PostgreSQL.ColumnWriters;
+using Log = Serilog.Log;
 
 namespace Host;
 
@@ -27,6 +32,25 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IVmMapper<Dictionary<string, SchemaFieldViewModel>, List<SchemaField>>, SchemaObjectFieldsMapper>();
         services.AddTransient<IVmMapper<SchemaObject, SchemaObjectViewModel>, SchemaObjectToVmMapper>();
+    }
+
+    public static void AddLogger(this IServiceCollection services, string connectionString)
+    {
+        var columnOptions = new Dictionary<string, ColumnWriterBase>
+        {
+            { "Message", new RenderedMessageColumnWriter(NpgsqlDbType.Text) },
+            { "Level", new LevelColumnWriter(true, NpgsqlDbType.Varchar) },
+            { "Timestamp", new TimestampColumnWriter(NpgsqlDbType.TimestampTz) },
+            { "Exception", new ExceptionColumnWriter(NpgsqlDbType.Text) },
+        };
+
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.PostgreSQL(
+                connectionString: connectionString,
+                tableName: "Logs",
+                columnOptions: columnOptions,
+                batchSizeLimit:1, needAutoCreateTable: true)
+            .CreateLogger();
     }
 
     public static void ConfigureSwagger(this IServiceCollection services)
