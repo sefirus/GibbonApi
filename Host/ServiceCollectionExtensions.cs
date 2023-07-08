@@ -45,6 +45,7 @@ public static class ServiceCollectionExtensions
         };
 
         Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Error()
             .WriteTo.PostgreSQL(
                 connectionString: connectionString,
                 tableName: "Logs",

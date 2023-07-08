@@ -1,5 +1,4 @@
 ﻿using Core.Entities;
-using Core.Enums;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.ViewModels.Schema;
@@ -69,7 +68,6 @@ public class SchemaService : ISchemaService
                     .ThenInclude(chf => chf.ChildFields)
             .SingleAsync(s => s.WorkspaceId == workspaceId 
                 && s.Name.ToLower() == schemaObjectName.ToLower());
-        throw new DivideByZeroException();
         return schemaObject;
     }
 }
