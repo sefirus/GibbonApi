@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using System.Security.Cryptography;
+using Core.Entities;
 using Core.ViewModels.Schema;
 
 namespace Core.Enums;
@@ -96,6 +97,18 @@ public static class DataTypesEnum
 
         throw new InvalidOperationException();
     }
+    
+    public static DataType GetArrayDataTypeObject(string nestedType)
+    {
+        var arrayNestedType = GetDataType(nestedType)!;
+        if (arrayNestedType != Array)
+        {
+            return DataTypes.Single(dt => dt.Name == Array && dt.NestedTypeName == arrayNestedType);
+        }
+
+        throw new InvalidOperationException();
+    }
+    
     public static DataType GetDataTypeObjectById(Guid id)
     {
         return DataTypes.Single(dt => dt.Id == id);

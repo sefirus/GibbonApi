@@ -36,7 +36,7 @@ public class SchemaObjectFieldsMapper : IVmMapper<Dictionary<string, SchemaField
                 case DataTypesEnum.Array when schemaFieldViewModel.ArrayElement != null: 
                     schemaField.ChildFields = Map(new Dictionary<string, SchemaFieldViewModel>
                     {
-                        { schemaFieldViewModel.FieldName!, schemaFieldViewModel.ArrayElement }
+                        { schemaFieldViewModel.FieldName ?? key, schemaFieldViewModel.ArrayElement }
                     });
                     break;
                 case DataTypesEnum.Object when schemaFieldViewModel.Fields != null && schemaFieldViewModel.Fields.Any():
