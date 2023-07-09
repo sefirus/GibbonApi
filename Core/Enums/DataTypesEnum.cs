@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using Core.Entities;
+﻿using Core.Entities;
 using Core.ViewModels.Schema;
 
 namespace Core.Enums;
@@ -113,4 +112,20 @@ public static class DataTypesEnum
     {
         return DataTypes.Single(dt => dt.Id == id);
     }
+}
+
+public static class DataTypeIdsEnum
+{
+    public static readonly Guid StringId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+    public static readonly Guid IntId = Guid.Parse("00000000-0000-0000-0000-000000000002");
+    public static readonly Guid FloatId = Guid.Parse("00000000-0000-0000-0000-000000000003");
+    public static readonly Guid ObjectId_Id = Guid.Parse("00000000-0000-0000-0000-000000000004");
+    public static readonly Guid UuidId = Guid.Parse("00000000-0000-0000-0000-000000000005");
+    public static readonly Guid ObjectId = Guid.Parse("00000000-0000-0000-0000-000000000006");
+    public static readonly Guid StringArrayId = Guid.Parse("00000000-0000-0000-0000-000000000007");
+    public static readonly Guid IntArrayId = Guid.Parse("00000000-0000-0000-0000-000000000008");
+    public static readonly Guid FloatArrayId = Guid.Parse("00000000-0000-0000-0000-000000000009");
+    public static readonly Guid ObjectIdArrayId = Guid.Parse("00000000-0000-0000-0000-000000000010");
+    public static readonly Guid UuidArrayId = Guid.Parse("00000000-0000-0000-0000-000000000011");
+    public static readonly Guid ObjectArrayId = Guid.Parse("00000000-0000-0000-0000-000000000012");
 }

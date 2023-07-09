@@ -122,4 +122,94 @@ public class SchemaFieldMappingFixture
             } 
         }
     };
+    
+    public Dictionary<string, SchemaFieldViewModel> ArrayOfMixedTypesSource => new()
+    {
+        { "IntField", new SchemaFieldViewModel { Type = DataTypesEnum.Array, ArrayElement = new SchemaFieldViewModel { Type = DataTypesEnum.Int, Min = -50, Max = 50 } } },
+        { "FloatField", new SchemaFieldViewModel { Type = DataTypesEnum.Array, ArrayElement = new SchemaFieldViewModel { Type = DataTypesEnum.Float, Min = -50, Max = 50 } } },
+        { "StringField", new SchemaFieldViewModel { Type = DataTypesEnum.Array, ArrayElement = new SchemaFieldViewModel { Type = DataTypesEnum.String, Length = 30 } } },
+        { "ObjectIdField", new SchemaFieldViewModel { Type = DataTypesEnum.Array, ArrayElement = new SchemaFieldViewModel { Type = DataTypesEnum.ObjectId } } },
+        { "ObjectField", new SchemaFieldViewModel 
+            { 
+                Type = DataTypesEnum.Array, 
+                ArrayElement = new SchemaFieldViewModel 
+                { 
+                    Type = DataTypesEnum.Object, 
+                    Fields = new()
+                    {
+                        new SchemaFieldViewModel { FieldName = "NestedIntField", Type = DataTypesEnum.Int, Min = -100, Max = 500 } ,
+                        new SchemaFieldViewModel { FieldName = "NestedFloatField", Type = DataTypesEnum.Float, Min = 0, Max = 1 } ,
+                        new SchemaFieldViewModel { FieldName = "NestedStringField", Type = DataTypesEnum.String, Length = 15 } ,
+                        new SchemaFieldViewModel { FieldName = "NestedObjectIdField", Type = DataTypesEnum.ObjectId } ,
+                        new SchemaFieldViewModel { FieldName = "NestedUuidField", Type = DataTypesEnum.Uuid } ,
+                    }
+                } 
+            }
+        }
+    };
+
+    public List<SchemaField> ArrayOfMixedTypesExpected => new()
+    {
+        new SchemaField()
+        {
+            FieldName = "IntField", 
+            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Int").Id, 
+            IsArray = true, 
+            ChildFields = new()
+            {
+                new SchemaField(){ FieldName = "IntField", DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = -50, Max = 50 }
+            }
+        },
+        new SchemaField()
+        {
+            FieldName = "FloatField", 
+            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Float").Id, 
+            IsArray = true, 
+            ChildFields = new()
+            {
+                new SchemaField(){ FieldName = "FloatField", DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id, Min = -50, Max = 50 }
+            }
+        },
+        new SchemaField()
+        {
+            FieldName = "StringField", 
+            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("String").Id, 
+            IsArray = true, ChildFields = new()
+            {
+                new SchemaField(){ FieldName = "StringField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 30 }
+            }
+        },
+        new SchemaField()
+        {
+            FieldName = "ObjectIdField", 
+            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("ObjectId").Id, 
+            IsArray = true, 
+            ChildFields = new()
+            {
+                new SchemaField(){ FieldName = "ObjectIdField", DataTypeId = DataTypesEnum.GetDataTypeObject("ObjectId").Id }
+            }
+        },
+        new SchemaField() { 
+            FieldName = "ObjectField", 
+            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Object").Id, 
+            IsArray = true, 
+            ChildFields = new()
+            { 
+                new SchemaField()
+                {
+                    FieldName = "ObjectField",
+                    DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
+                    IsArray = false,
+                    ChildFields = new()
+                    {
+                        new SchemaField() { FieldName = "NestedIntField", DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = -100, Max = 500 },
+                        new SchemaField() { FieldName = "NestedFloatField", DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id, Min = 0, Max = 1 },
+                        new SchemaField() { FieldName = "NestedStringField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 15 },
+                        new SchemaField() { FieldName = "NestedObjectIdField", DataTypeId = DataTypesEnum.GetDataTypeObject("ObjectId").Id },
+                        new SchemaField() { FieldName = "NestedUuidField", DataTypeId = DataTypesEnum.GetDataTypeObject("Uuid").Id },
+                    }
+                } 
+            } 
+        },
+    };
 }
