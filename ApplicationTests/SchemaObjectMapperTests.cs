@@ -88,6 +88,20 @@ public class SchemaObjectMapperTests : IClassFixture<SchemaFieldMappingFixture>
         // Assert
         AssertSchemaFieldsMatchExpected(expected, result);
     }
+    
+    [Fact]
+    public void Map_ShouldCorrectlyMapArrayOfObjectsWithNestedObjectsTestCase()
+    {
+        // Arrange
+        var source = _fixture.ArrayOfObjectsWithNestedObjectsSource;
+        var expected = _fixture.ArrayOfObjectsWithNestedObjectsExpected;
+
+        // Act
+        var result = _mapper.Map(source);
+
+        // Assert
+        AssertSchemaFieldsMatchExpected(expected, result);
+    }
 
     private void AssertSchemaFieldsMatchExpected(List<SchemaField> expected, List<SchemaField> result)
     {
