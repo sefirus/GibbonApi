@@ -212,4 +212,83 @@ public class SchemaFieldMappingFixture
             } 
         },
     };
+    
+    public Dictionary<string, SchemaFieldViewModel> ObjectOfObjectsSource => new()
+    {
+        { "IntObjectField", new SchemaFieldViewModel 
+            { 
+                Type = DataTypesEnum.Object, 
+                Fields = new List<SchemaFieldViewModel> 
+                { 
+                    new SchemaFieldViewModel { FieldName = "IntObjectNestedField", Type = DataTypesEnum.Int, Min = -50, Max = 50 } 
+                } 
+            } 
+        },
+        { "FloatObjectField", new SchemaFieldViewModel 
+            { 
+                Type = DataTypesEnum.Object, 
+                Fields = new List<SchemaFieldViewModel> 
+                { 
+                    new SchemaFieldViewModel { FieldName = "FloatObjectNestedField", Type = DataTypesEnum.Float, Min = -50, Max = 50 } 
+                } 
+            } 
+        },
+        { "StringObjectField", new SchemaFieldViewModel 
+            { 
+                Type = DataTypesEnum.Object, 
+                Fields = new List<SchemaFieldViewModel> 
+                { 
+                    new SchemaFieldViewModel { FieldName = "StringObjectNestedField", Type = DataTypesEnum.String, Length = 30 } 
+                } 
+            } 
+        }
+    };
+
+    public List<SchemaField> ObjectOfObjectsExpected => new()
+    {
+        new SchemaField()
+        {
+            FieldName = "IntObjectField",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
+            ChildFields = new()
+            {
+                new SchemaField()
+                {
+                    FieldName = "IntObjectNestedField",
+                    DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id,
+                    Min = -50,
+                    Max = 50
+                }
+            }
+        },
+        new SchemaField()
+        {
+            FieldName = "FloatObjectField",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
+            ChildFields = new()
+            {
+                new SchemaField()
+                {
+                    FieldName = "FloatObjectNestedField",
+                    DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id,
+                    Min = -50,
+                    Max = 50
+                }
+            }
+        },
+        new SchemaField()
+        {
+            FieldName = "StringObjectField",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
+            ChildFields = new()
+            {
+                new SchemaField()
+                {
+                    FieldName = "StringObjectNestedField",
+                    DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+                    Length = 30
+                }
+            }
+        }
+    };
 }

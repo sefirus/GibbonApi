@@ -163,4 +163,47 @@ public class SchemaObjectMapperTests : IClassFixture<SchemaFieldMappingFixture>
             }
         }
     }
+    
+    [Fact]
+    public void Map_ShouldCorrectlyMapObjectOfObjectsTestCase()
+    {
+        // Arrange
+        var source = _fixture.ObjectOfObjectsSource;
+        var expected = _fixture.ObjectOfObjectsExpected;
+
+        // Act
+        var result = _mapper.Map(source);
+
+        // Assert
+        Assert.Equal(expected.Count, result.Count);
+
+        for (var i = 0; i < result.Count; i++)
+        {
+            var expectedField = expected[i];
+            var resultField = result[i];
+            Assert.Equal(expectedField.FieldName, resultField.FieldName);
+            Assert.Equal(expectedField.DataTypeId, resultField.DataTypeId);
+            Assert.Equal(expectedField.IsArray, resultField.IsArray);
+
+            if (expectedField is { ChildFields: not null })
+            {
+                var expectedChildField = expectedField.ChildFields.Single();
+                var resultChildField = resultField.ChildFields.Single();
+                Assert.Single(resultField.ChildFields);
+                Assert.Equal(expectedChildField.FieldName, resultChildField.FieldName);
+                Assert.Equal(expectedChildField.DataTypeId, resultChildField.DataTypeId);
+                Assert.Equal(expectedChildField.Min, resultChildField.Min);
+                Assert.Equal(expectedChildField.Max, resultChildField.Max);
+                Assert.Equal(expectedChildField.Pattern, resultChildField.Pattern);
+                Assert.Equal(expectedChildField.Length, resultChildField.Length);
+            }
+            else
+            {
+                Assert.Equal(expectedField.Min, resultField.Min);
+                Assert.Equal(expectedField.Max, resultField.Max);
+                Assert.Equal(expectedField.Pattern, resultField.Pattern);
+                Assert.Equal(expectedField.Length, resultField.Length);
+            }
+        }
+    }
 }
