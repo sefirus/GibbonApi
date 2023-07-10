@@ -440,4 +440,141 @@ public class SchemaFieldMappingFixture
             }
         },
     };
+    
+    public Dictionary<string, SchemaFieldViewModel> ComplexNestedArraysSource => new()
+    {
+        {
+            "ArrayOfArraysOfObjects", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Array,
+                ArrayElement = new SchemaFieldViewModel
+                {
+                    Type = DataTypesEnum.Array,
+                    ArrayElement = new SchemaFieldViewModel
+                    {
+                        Type = DataTypesEnum.Object,
+                        Fields = new List<SchemaFieldViewModel>
+                        {
+                            new SchemaFieldViewModel
+                            {
+                                FieldName = "IntField",
+                                Type = DataTypesEnum.Int,
+                                Min = -50,
+                                Max = 50
+                            },
+                            new SchemaFieldViewModel
+                            {
+                                FieldName = "FloatField",
+                                Type = DataTypesEnum.Float,
+                                Min = -50,
+                                Max = 50
+                            },
+                            new SchemaFieldViewModel
+                            {
+                                FieldName = "StringField",
+                                Type = DataTypesEnum.String,
+                                Length = 30
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "ArrayOfArraysOfArraysOfInts", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Array,
+                ArrayElement = new SchemaFieldViewModel
+                {
+                    Type = DataTypesEnum.Array,
+                    ArrayElement = new SchemaFieldViewModel
+                    {
+                        Type = DataTypesEnum.Array,
+                        ArrayElement = new SchemaFieldViewModel
+                        {
+                            Type = DataTypesEnum.Int,
+                            Min = 0,
+                            Max = 100
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    public List<SchemaField> ComplexNestedArraysExpected => new()
+    {
+        new SchemaField
+        {
+            FieldName = "ArrayOfArraysOfObjects",
+            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Array").Id,
+            IsArray = true,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "ArrayOfArraysOfObjects",
+                    DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Object").Id,
+                    IsArray = true,
+                    ChildFields = new List<SchemaField>
+                    {
+                        new SchemaField
+                        {
+                            FieldName = "IntField",
+                            DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id,
+                            Min = -50,
+                            Max = 50
+                        },
+                        new SchemaField
+                        {
+                            FieldName = "FloatField",
+                            DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id,
+                            Min = -50,
+                            Max = 50
+                        },
+                        new SchemaField
+                        {
+                            FieldName = "StringField",
+                            DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+                            Length = 30
+                        }
+                    }
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "ArrayOfArraysOfArraysOfInts",
+            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Array").Id,
+            IsArray = true,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "ArrayOfArraysOfArraysOfInts",
+                    DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Array").Id,
+                    IsArray = true,
+                    ChildFields = new List<SchemaField>
+                    {
+                        new SchemaField
+                        {
+                            FieldName = "ArrayOfArraysOfArraysOfInts",
+                            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Int").Id,
+                            IsArray = true,
+                            ChildFields = new List<SchemaField>
+                            {
+                                new SchemaField
+                                {
+                                    FieldName = "ArrayOfArraysOfArraysOfInts",
+                                    DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id,
+                                    Min = 0,
+                                    Max = 100
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
 }
