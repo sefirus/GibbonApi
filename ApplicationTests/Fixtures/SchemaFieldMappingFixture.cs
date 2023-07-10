@@ -49,7 +49,7 @@ public class SchemaFieldMappingFixture
             IsArray = true, 
             ChildFields = new()
             {
-                new (){ DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 15 }
+                new (){ FieldName = "StringArrayField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 15 }
             },
         },
         new () { 
@@ -58,7 +58,7 @@ public class SchemaFieldMappingFixture
             IsArray = true, 
             ChildFields = new()
             {
-                new (){ DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = 0, Max = 100}
+                new (){ FieldName = "IntArrayField", DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = 0, Max = 100}
             } 
         },
     };
