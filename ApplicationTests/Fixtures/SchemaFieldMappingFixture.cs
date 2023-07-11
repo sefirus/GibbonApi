@@ -45,7 +45,7 @@ public class SchemaFieldMappingFixture
         new ()
         {
             FieldName = "StringArrayField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("String").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             {
@@ -54,7 +54,7 @@ public class SchemaFieldMappingFixture
         },
         new () { 
             FieldName = "IntArrayField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Int").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             {
@@ -76,7 +76,7 @@ public class SchemaFieldMappingFixture
     {
         new () { 
             FieldName = "IntArrayField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Int").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             {
@@ -85,7 +85,7 @@ public class SchemaFieldMappingFixture
         },
         new () { 
             FieldName = "FloatArrayField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Float").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             {
@@ -95,7 +95,7 @@ public class SchemaFieldMappingFixture
         new ()
         {
             FieldName = "StringArrayField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("String").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             {
@@ -105,7 +105,7 @@ public class SchemaFieldMappingFixture
         new ()
         {
             FieldName = "ObjectIdArrayField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("ObjectId").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             {
@@ -114,7 +114,7 @@ public class SchemaFieldMappingFixture
         },
         new () { 
             FieldName = "UuidArrayField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Uuid").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             {
@@ -153,7 +153,7 @@ public class SchemaFieldMappingFixture
         new SchemaField()
         {
             FieldName = "IntField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Int").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             {
@@ -163,7 +163,7 @@ public class SchemaFieldMappingFixture
         new SchemaField()
         {
             FieldName = "FloatField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Float").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             {
@@ -173,7 +173,7 @@ public class SchemaFieldMappingFixture
         new SchemaField()
         {
             FieldName = "StringField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("String").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, ChildFields = new()
             {
                 new SchemaField(){ FieldName = "StringField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 30 }
@@ -182,7 +182,7 @@ public class SchemaFieldMappingFixture
         new SchemaField()
         {
             FieldName = "ObjectIdField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("ObjectId").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             {
@@ -191,7 +191,7 @@ public class SchemaFieldMappingFixture
         },
         new SchemaField() { 
             FieldName = "ObjectField", 
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Object").Id, 
+            DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
             ChildFields = new()
             { 
@@ -376,7 +376,7 @@ public class SchemaFieldMappingFixture
         new SchemaField
         {
             FieldName = "ArrayOfObjectsField",
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Object").Id,
+            DataTypeId = DataTypeIdsEnum.ArrayId,
             IsArray = true,
             ChildFields = new List<SchemaField>
             {
@@ -507,14 +507,14 @@ public class SchemaFieldMappingFixture
         new SchemaField
         {
             FieldName = "ArrayOfArraysOfObjects",
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Array").Id,
+            DataTypeId = DataTypeIdsEnum.ArrayId,
             IsArray = true,
             ChildFields = new List<SchemaField>
             {
                 new SchemaField
                 {
                     FieldName = "ArrayOfArraysOfObjects",
-                    DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Object").Id,
+                    DataTypeId = DataTypeIdsEnum.ArrayId,
                     IsArray = true,
                     ChildFields = new List<SchemaField>
                     {
@@ -545,21 +545,21 @@ public class SchemaFieldMappingFixture
         new SchemaField
         {
             FieldName = "ArrayOfArraysOfArraysOfInts",
-            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Array").Id,
+            DataTypeId = DataTypeIdsEnum.ArrayId,
             IsArray = true,
             ChildFields = new List<SchemaField>
             {
                 new SchemaField
                 {
                     FieldName = "ArrayOfArraysOfArraysOfInts",
-                    DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Array").Id,
+                    DataTypeId = DataTypeIdsEnum.ArrayId,
                     IsArray = true,
                     ChildFields = new List<SchemaField>
                     {
                         new SchemaField
                         {
                             FieldName = "ArrayOfArraysOfArraysOfInts",
-                            DataTypeId = DataTypesEnum.GetArrayDataTypeObject("Int").Id,
+                            DataTypeId = DataTypeIdsEnum.ArrayId,
                             IsArray = true,
                             ChildFields = new List<SchemaField>
                             {

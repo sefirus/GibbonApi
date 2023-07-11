@@ -94,6 +94,5 @@ public static class DataTypeIdsEnum
     public static readonly Guid ObjectId_Id = Guid.Parse("00000000-0000-0000-0000-000000000004");
     public static readonly Guid UuidId = Guid.Parse("00000000-0000-0000-0000-000000000005");
     public static readonly Guid ObjectId = Guid.Parse("00000000-0000-0000-0000-000000000006");
-    public static readonly Guid StringArrayId = Guid.Parse("00000000-0000-0000-0000-000000000007");
-    public static readonly Guid ArrayId = Guid.Parse("00000000-0000-0000-0000-000000000008");
+    public static readonly Guid ArrayId = Guid.Parse("00000000-0000-0000-0000-000000000007");
 }
