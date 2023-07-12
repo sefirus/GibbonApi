@@ -577,4 +577,130 @@ public class SchemaFieldMappingFixture
             }
         }
     };
+    
+    public Dictionary<string, SchemaFieldViewModel> ObjectWithPatternSource => new()
+    {
+        {
+            "StringPatternField1", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.String,
+                Length = 20,
+                Pattern = @"^\d{5}$"
+            }
+        },
+        {
+            "ArrayOfStringsPatternField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Array,
+                ArrayElement = new SchemaFieldViewModel
+                {
+                    Type = DataTypesEnum.String,
+                    Length = 20,
+                    Pattern = @"^\d{5}$"
+                }
+            }
+        },
+        {
+            "ObjectOfStringsPatternField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Object,
+                Fields = new List<SchemaFieldViewModel>
+                {
+                    new SchemaFieldViewModel
+                    {
+                        FieldName = "StringField",
+                        Type = DataTypesEnum.String,
+                        Length = 20,
+                        Pattern = @"^\d{5}$"
+                    }
+                }
+            }
+        },
+        {
+            "StringPatternField2", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.String,
+                Length = 10,
+                Pattern = @"^[a-z]{5}$"
+            }
+        },
+        {
+            "ArrayOfStringsPatternField2", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Array,
+                ArrayElement = new SchemaFieldViewModel
+                {
+                    Type = DataTypesEnum.String,
+                    Length = 10,
+                    Pattern = @"^[a-z]{5}$"
+                }
+            }
+        },
+    };
+
+    public List<SchemaField> ObjectWithPatternExpected => new()
+    {
+        new SchemaField
+        {
+            FieldName = "StringPatternField1",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+            Length = 20,
+            Pattern = @"^\d{5}$"
+        },
+        new SchemaField
+        {
+            FieldName = "ArrayOfStringsPatternField",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("Array").Id,
+            IsArray = true,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "ArrayOfStringsPatternField",
+                    DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+                    Length = 20,
+                    Pattern = @"^\d{5}$"
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "ObjectOfStringsPatternField",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "StringField",
+                    DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+                    Length = 20,
+                    Pattern = @"^\d{5}$"
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "StringPatternField2",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+            Length = 10,
+            Pattern = @"^[a-z]{5}$"
+        },
+        new SchemaField
+        {
+            FieldName = "ArrayOfStringsPatternField2",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("Array").Id,
+            IsArray = true,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "ArrayOfStringsPatternField2",
+                    DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+                    Length = 10,
+                    Pattern = @"^[a-z]{5}$"
+                }
+            }
+        }
+    };
+
 }
