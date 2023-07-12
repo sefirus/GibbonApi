@@ -854,5 +854,86 @@ public class SchemaFieldMappingFixture
             }
         }
     };
+    public Dictionary<string, SchemaFieldViewModel> ObjectWithSummarySource => new()
+    {
+        {
+            "StringField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.String,
+                Length = 20,
+                Summary = "string field"
+            }
+        },
+        {
+            "IntField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Int,
+                Min = -50,
+                Max = 50,
+                Summary = "int field"
+            }
+        },
+        {
+            "FloatField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Float,
+                Min = -50.0f,
+                Max = 50.0f,
+                Summary = "float field"
+            }
+        },
+        {
+            "ObjectIdField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.ObjectId,
+                Summary = "ObjectId field"
+            }
+        },
+        {
+            "UuidField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Uuid,
+                Summary = "Uuid field"
+            }
+        }
+    };
 
+    public List<SchemaField> ObjectWithSummaryExpected => new()
+    {
+        new SchemaField
+        {
+            FieldName = "StringField",
+            DataTypeId = DataTypeIdsEnum.StringId,
+            Length = 20,
+            Summary = "string field"
+        },
+        new SchemaField
+        {
+            FieldName = "IntField",
+            DataTypeId = DataTypeIdsEnum.IntId,
+            Min = -50,
+            Max = 50,
+            Summary = "int field"
+        },
+        new SchemaField
+        {
+            FieldName = "FloatField",
+            DataTypeId = DataTypeIdsEnum.FloatId,
+            Min = -50.0f,
+            Max = 50.0f,
+            Summary = "float field"
+        },
+        new SchemaField
+        {
+            FieldName = "ObjectIdField",
+            DataTypeId = DataTypeIdsEnum.ObjectId_Id,
+            Summary = "ObjectId field"
+        },
+        new SchemaField
+        {
+            FieldName = "UuidField",
+            DataTypeId = DataTypeIdsEnum.UuidId,
+            Summary = "Uuid field"
+        }
+    };
 }

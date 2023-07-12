@@ -142,6 +142,20 @@ public class SchemaObjectMapperTests : IClassFixture<SchemaFieldMappingFixture>
         // Assert
         AssertSchemaFieldsMatchExpected(expected, result);
     }
+    
+    [Fact]
+    public void Map_ShouldCorrectlyMapObjectWithSummary()
+    {
+        // Arrange
+        var source = _fixture.ObjectWithSummarySource;
+        var expected = _fixture.ObjectWithSummaryExpected;
+
+        // Act
+        var result = _mapper.Map(source);
+
+        // Assert
+        AssertSchemaFieldsMatchExpected(expected, result);
+    }
 
     private void AssertSchemaFieldsMatchExpected(List<SchemaField> expected, List<SchemaField> result)
     {
