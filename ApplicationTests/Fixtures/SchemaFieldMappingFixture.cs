@@ -702,5 +702,157 @@ public class SchemaFieldMappingFixture
             }
         }
     };
+    
+    public Dictionary<string, SchemaFieldViewModel> ObjectWithPrimaryKeySource => new()
+    {
+        {
+            "StringPKField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.String,
+                Length = 20,
+                IsPrimaryKey = true
+            }
+        },
+        {
+            "ArrayOfStringsField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Array,
+                ArrayElement = new SchemaFieldViewModel
+                {
+                    Type = DataTypesEnum.String,
+                    Length = 20
+                }
+            }
+        },
+        {
+            "ObjectOfStringsField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Object,
+                Fields = new List<SchemaFieldViewModel>
+                {
+                    new SchemaFieldViewModel
+                    {
+                        FieldName = "StringField",
+                        Type = DataTypesEnum.String,
+                        Length = 20
+                    }
+                }
+            }
+        },
+        {
+            "IntField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Int,
+                Min = -50,
+                Max = 50
+            }
+        },
+        {
+            "ArrayOfIntsField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Array,
+                ArrayElement = new SchemaFieldViewModel
+                {
+                    Type = DataTypesEnum.Int,
+                    Min = -50,
+                    Max = 50
+                }
+            }
+        },
+        {
+            "ObjectOfIntsField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Object,
+                Fields = new List<SchemaFieldViewModel>
+                {
+                    new SchemaFieldViewModel
+                    {
+                        FieldName = "IntField",
+                        Type = DataTypesEnum.Int,
+                        Min = -50,
+                        Max = 50
+                    }
+                }
+            }
+        },
+    };
+
+    public List<SchemaField> ObjectWithPrimaryKeyExpected => new()
+    {
+        new SchemaField
+        {
+            FieldName = "StringPKField",
+            DataTypeId = DataTypeIdsEnum.StringId,
+            Length = 20,
+            IsPrimaryKey = true
+        },
+        new SchemaField
+        {
+            FieldName = "ArrayOfStringsField",
+            DataTypeId = DataTypeIdsEnum.ArrayId,
+            IsArray = true,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "ArrayOfStringsField",
+                    DataTypeId = DataTypeIdsEnum.StringId,
+                    Length = 20
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "ObjectOfStringsField",
+            DataTypeId = DataTypeIdsEnum.ObjectId,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "StringField",
+                    DataTypeId = DataTypeIdsEnum.StringId,
+                    Length = 20
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "IntField",
+            DataTypeId = DataTypeIdsEnum.IntId,
+            Min = -50,
+            Max = 50
+        },
+        new SchemaField
+        {
+            FieldName = "ArrayOfIntsField",
+            DataTypeId = DataTypeIdsEnum.ArrayId,
+            IsArray = true,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "ArrayOfIntsField",
+                    DataTypeId = DataTypeIdsEnum.IntId,
+                    Min = -50,
+                    Max = 50
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "ObjectOfIntsField",
+            DataTypeId = DataTypeIdsEnum.ObjectId,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "IntField",
+                    DataTypeId = DataTypeIdsEnum.IntId,
+                    Min = -50,
+                    Max = 50
+                }
+            }
+        }
+    };
 
 }

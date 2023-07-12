@@ -116,11 +116,25 @@ public class SchemaObjectMapperTests : IClassFixture<SchemaFieldMappingFixture>
     }
 
     [Fact]
-    public void Map_ShouldCorrectlyMapObjectWithPatternSource()
+    public void Map_ShouldCorrectlyMapObjectWithPatterns()
     {
         // Arrange
         var source = _fixture.ObjectWithPatternSource;
         var expected = _fixture.ObjectWithPatternExpected;
+
+        // Act
+        var result = _mapper.Map(source);
+
+        // Assert
+        AssertSchemaFieldsMatchExpected(expected, result);
+    }
+    
+    [Fact]
+    public void Map_ShouldCorrectlyMapObjectWithPrimaryKey()
+    {
+        // Arrange
+        var source = _fixture.ObjectWithPrimaryKeySource;
+        var expected = _fixture.ObjectWithPrimaryKeyExpected;
 
         // Act
         var result = _mapper.Map(source);
