@@ -58,34 +58,16 @@ public static class Seed
     {
         var initialDataTypes = new List<DataType>
         {
-            new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), Name = DataTypesEnum.String, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
-            new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), Name = DataTypesEnum.Int, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
-            new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000003"), Name = DataTypesEnum.Float, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
-            new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"), Name = DataTypesEnum.ObjectId, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
-            new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000005"), Name = DataTypesEnum.Uuid, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
-            new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000006"), Name = DataTypesEnum.Object, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
+            new DataType { Id = DataTypeIdsEnum.StringId, Name = DataTypesEnum.String, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
+            new DataType { Id = DataTypeIdsEnum.IntId, Name = DataTypesEnum.Int, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
+            new DataType { Id = DataTypeIdsEnum.FloatId, Name = DataTypesEnum.Float, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
+            new DataType { Id = DataTypeIdsEnum.ObjectId_Id, Name = DataTypesEnum.ObjectId, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
+            new DataType { Id = DataTypeIdsEnum.UuidId, Name = DataTypesEnum.Uuid, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
+            new DataType { Id = DataTypeIdsEnum.ObjectId, Name = DataTypesEnum.Object, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
+            new DataType { Id = DataTypeIdsEnum.ArrayId, Name = DataTypesEnum.Array, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
         };
-    
-        var arrayNestedTypeId = 7;
-
-        var arrayDataTypes = new List<DataType>();
-        foreach (var dataType in initialDataTypes)
-        {
-            var formattedId = arrayNestedTypeId.ToString("D12"); // Formats the integer with leading zeros to be 12 characters long
-            var arrayNestedType = new DataType 
-            {
-                Id = Guid.Parse($"00000000-0000-0000-0000-{formattedId}"),
-                Name = DataTypesEnum.Array,
-                NestedTypeId = dataType.Id,
-                CreatedDate = DateTime.UtcNow,
-                ModifiedDate = DateTime.UtcNow
-            };
-
-            arrayDataTypes.Add(arrayNestedType);
-            arrayNestedTypeId++;
-        }
+        
 
         modelBuilder.Entity<DataType>().HasData(initialDataTypes);
-        modelBuilder.Entity<DataType>().HasData(arrayDataTypes);
     }
 }
