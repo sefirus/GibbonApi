@@ -6,6 +6,7 @@ using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.ViewModels.Schema;
 using DataAccess;
+using IdentityServer4;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions
     public static void AddApplicationServices(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
+        services.AddMemoryCache();
         services.AddTransient<ICurrentUserService, CurrentUserService>();
         services.AddTransient<IWorkspaceService, WorkspaceService>();
         services.AddTransient<IUserService, UserService>();

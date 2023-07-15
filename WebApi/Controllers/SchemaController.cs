@@ -27,7 +27,7 @@ public class SchemaController : ControllerBase
     [HttpGet("{workspaceId:guid}")]
     public async Task<SchemaObjectViewModel> GetSchemaObject([FromRoute]Guid workspaceId, [FromQuery]string schemaObjectName)
     {
-        var obj = await _schemaService.GetSchemaObject(workspaceId, schemaObjectName);
+        var obj = await _schemaService.RetrieveSchemaObject(workspaceId, schemaObjectName);
         var viewModel = _schemaObjectViewModelMapper.Map(obj);
         return viewModel;
     }
