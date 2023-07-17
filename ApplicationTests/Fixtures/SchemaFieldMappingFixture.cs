@@ -577,4 +577,363 @@ public class SchemaFieldMappingFixture
             }
         }
     };
+    
+    public Dictionary<string, SchemaFieldViewModel> ObjectWithPatternSource => new()
+    {
+        {
+            "StringPatternField1", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.String,
+                Length = 20,
+                Pattern = @"^\d{5}$"
+            }
+        },
+        {
+            "ArrayOfStringsPatternField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Array,
+                ArrayElement = new SchemaFieldViewModel
+                {
+                    Type = DataTypesEnum.String,
+                    Length = 20,
+                    Pattern = @"^\d{5}$"
+                }
+            }
+        },
+        {
+            "ObjectOfStringsPatternField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Object,
+                Fields = new List<SchemaFieldViewModel>
+                {
+                    new SchemaFieldViewModel
+                    {
+                        FieldName = "StringField",
+                        Type = DataTypesEnum.String,
+                        Length = 20,
+                        Pattern = @"^\d{5}$"
+                    }
+                }
+            }
+        },
+        {
+            "StringPatternField2", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.String,
+                Length = 10,
+                Pattern = @"^[a-z]{5}$"
+            }
+        },
+        {
+            "ArrayOfStringsPatternField2", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Array,
+                ArrayElement = new SchemaFieldViewModel
+                {
+                    Type = DataTypesEnum.String,
+                    Length = 10,
+                    Pattern = @"^[a-z]{5}$"
+                }
+            }
+        },
+    };
+
+    public List<SchemaField> ObjectWithPatternExpected => new()
+    {
+        new SchemaField
+        {
+            FieldName = "StringPatternField1",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+            Length = 20,
+            Pattern = @"^\d{5}$"
+        },
+        new SchemaField
+        {
+            FieldName = "ArrayOfStringsPatternField",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("Array").Id,
+            IsArray = true,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "ArrayOfStringsPatternField",
+                    DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+                    Length = 20,
+                    Pattern = @"^\d{5}$"
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "ObjectOfStringsPatternField",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "StringField",
+                    DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+                    Length = 20,
+                    Pattern = @"^\d{5}$"
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "StringPatternField2",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+            Length = 10,
+            Pattern = @"^[a-z]{5}$"
+        },
+        new SchemaField
+        {
+            FieldName = "ArrayOfStringsPatternField2",
+            DataTypeId = DataTypesEnum.GetDataTypeObject("Array").Id,
+            IsArray = true,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "ArrayOfStringsPatternField2",
+                    DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+                    Length = 10,
+                    Pattern = @"^[a-z]{5}$"
+                }
+            }
+        }
+    };
+    
+    public Dictionary<string, SchemaFieldViewModel> ObjectWithPrimaryKeySource => new()
+    {
+        {
+            "StringPKField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.String,
+                Length = 20,
+                IsPrimaryKey = true
+            }
+        },
+        {
+            "ArrayOfStringsField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Array,
+                ArrayElement = new SchemaFieldViewModel
+                {
+                    Type = DataTypesEnum.String,
+                    Length = 20
+                }
+            }
+        },
+        {
+            "ObjectOfStringsField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Object,
+                Fields = new List<SchemaFieldViewModel>
+                {
+                    new SchemaFieldViewModel
+                    {
+                        FieldName = "StringField",
+                        Type = DataTypesEnum.String,
+                        Length = 20
+                    }
+                }
+            }
+        },
+        {
+            "IntField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Int,
+                Min = -50,
+                Max = 50
+            }
+        },
+        {
+            "ArrayOfIntsField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Array,
+                ArrayElement = new SchemaFieldViewModel
+                {
+                    Type = DataTypesEnum.Int,
+                    Min = -50,
+                    Max = 50
+                }
+            }
+        },
+        {
+            "ObjectOfIntsField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Object,
+                Fields = new List<SchemaFieldViewModel>
+                {
+                    new SchemaFieldViewModel
+                    {
+                        FieldName = "IntField",
+                        Type = DataTypesEnum.Int,
+                        Min = -50,
+                        Max = 50
+                    }
+                }
+            }
+        },
+    };
+
+    public List<SchemaField> ObjectWithPrimaryKeyExpected => new()
+    {
+        new SchemaField
+        {
+            FieldName = "StringPKField",
+            DataTypeId = DataTypeIdsEnum.StringId,
+            Length = 20,
+            IsPrimaryKey = true
+        },
+        new SchemaField
+        {
+            FieldName = "ArrayOfStringsField",
+            DataTypeId = DataTypeIdsEnum.ArrayId,
+            IsArray = true,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "ArrayOfStringsField",
+                    DataTypeId = DataTypeIdsEnum.StringId,
+                    Length = 20
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "ObjectOfStringsField",
+            DataTypeId = DataTypeIdsEnum.ObjectId,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "StringField",
+                    DataTypeId = DataTypeIdsEnum.StringId,
+                    Length = 20
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "IntField",
+            DataTypeId = DataTypeIdsEnum.IntId,
+            Min = -50,
+            Max = 50
+        },
+        new SchemaField
+        {
+            FieldName = "ArrayOfIntsField",
+            DataTypeId = DataTypeIdsEnum.ArrayId,
+            IsArray = true,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "ArrayOfIntsField",
+                    DataTypeId = DataTypeIdsEnum.IntId,
+                    Min = -50,
+                    Max = 50
+                }
+            }
+        },
+        new SchemaField
+        {
+            FieldName = "ObjectOfIntsField",
+            DataTypeId = DataTypeIdsEnum.ObjectId,
+            ChildFields = new List<SchemaField>
+            {
+                new SchemaField
+                {
+                    FieldName = "IntField",
+                    DataTypeId = DataTypeIdsEnum.IntId,
+                    Min = -50,
+                    Max = 50
+                }
+            }
+        }
+    };
+    public Dictionary<string, SchemaFieldViewModel> ObjectWithSummarySource => new()
+    {
+        {
+            "StringField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.String,
+                Length = 20,
+                Summary = "string field"
+            }
+        },
+        {
+            "IntField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Int,
+                Min = -50,
+                Max = 50,
+                Summary = "int field"
+            }
+        },
+        {
+            "FloatField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Float,
+                Min = -50.0f,
+                Max = 50.0f,
+                Summary = "float field"
+            }
+        },
+        {
+            "ObjectIdField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.ObjectId,
+                Summary = "ObjectId field"
+            }
+        },
+        {
+            "UuidField", new SchemaFieldViewModel
+            {
+                Type = DataTypesEnum.Uuid,
+                Summary = "Uuid field"
+            }
+        }
+    };
+
+    public List<SchemaField> ObjectWithSummaryExpected => new()
+    {
+        new SchemaField
+        {
+            FieldName = "StringField",
+            DataTypeId = DataTypeIdsEnum.StringId,
+            Length = 20,
+            Summary = "string field"
+        },
+        new SchemaField
+        {
+            FieldName = "IntField",
+            DataTypeId = DataTypeIdsEnum.IntId,
+            Min = -50,
+            Max = 50,
+            Summary = "int field"
+        },
+        new SchemaField
+        {
+            FieldName = "FloatField",
+            DataTypeId = DataTypeIdsEnum.FloatId,
+            Min = -50.0f,
+            Max = 50.0f,
+            Summary = "float field"
+        },
+        new SchemaField
+        {
+            FieldName = "ObjectIdField",
+            DataTypeId = DataTypeIdsEnum.ObjectId_Id,
+            Summary = "ObjectId field"
+        },
+        new SchemaField
+        {
+            FieldName = "UuidField",
+            DataTypeId = DataTypeIdsEnum.UuidId,
+            Summary = "Uuid field"
+        }
+    };
 }
