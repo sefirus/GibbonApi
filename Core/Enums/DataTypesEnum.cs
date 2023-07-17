@@ -11,11 +11,12 @@ public static class DataTypesEnum
     public const string ObjectId = "ObjectId";
     public const string Uuid = "Uuid";
     public const string Object = "Object";
+
     /// <summary>
     /// DataType for array. Requires NestedType
     /// </summary>
     public const string Array = "Array";
-    
+
     public static string? GetDataType(string? argument)
     {
         var lowercaseArgument = argument?.ToLower();
@@ -59,12 +60,12 @@ public static class DataTypesEnum
 
     public static readonly List<DataType> DataTypes = new()
     {
-        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), Name = String,  },
-        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), Name = Int,  },
-        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000003"), Name = Float,  },
-        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"), Name = ObjectId,  },
-        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000005"), Name = Uuid,  },
-        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000006"), Name = Object,  },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), Name = String, },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), Name = Int, },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000003"), Name = Float, },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"), Name = ObjectId, },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000005"), Name = Uuid, },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000006"), Name = Object, },
         new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000007"), Name = Array, }
     };
 
@@ -79,11 +80,26 @@ public static class DataTypesEnum
         var parentType = GetDataType(argument)!;
         return DataTypes.Single(dt => dt.Name == parentType);
     }
-    
+
     public static DataType GetDataTypeObjectById(Guid id)
     {
         return DataTypes.Single(dt => dt.Id == id);
     }
+
+    public static bool IsValueDataType(string? argument)
+    {
+        var dataType = GetDataTypeObject(argument);
+
+        return IsValueDataType(dataType.Id);
+    }
+
+    public static bool IsValueDataType(Guid argument)
+    {
+        return DataTypes.Any(dt => dt.Id == argument)
+            && argument != DataTypeIdsEnum.ArrayId 
+            && argument != DataTypeIdsEnum.ObjectId;
+    }
+
 }
 
 public static class DataTypeIdsEnum
