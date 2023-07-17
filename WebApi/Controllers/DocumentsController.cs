@@ -1,4 +1,5 @@
-﻿using Core.Enums;
+﻿using Application.Utils;
+using Core.Enums;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,14 @@ public class DocumentsController : ControllerBase
 
     [Authorize(Roles = AccessLevels.GeneralAccess)]
     [HttpPost("{workspaceId:guid}/{objectName}")]
-    public async Task<object> PostObject(string objectName, Guid workspaceId)
+    public async Task PostObject(string objectName, Guid workspaceId)
     {
-        return await _schemaService.GetSchemaObject(workspaceId, objectName);
+        var s = await _schemaService.GetSchemaObject(workspaceId, objectName);
+        using var bufferStream = new MemoryStream();
+        await HttpContext.Request.Body.CopyToAsync(bufferStream);
+        Memory<byte> buffer = bufferStream.ToArray();
+
+        var parser = new StoredDocumentJsonParser(s);
+        var result = parser.ParseJsonToObject(buffer.Span);
     }
 }
