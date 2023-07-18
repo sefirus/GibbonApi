@@ -1,5 +1,4 @@
-﻿using Application.Utils;
-using Core.Enums;
+﻿using Core.Enums;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,23 +9,21 @@ namespace WebApi.Controllers;
 [Route("api/")]
 public class DocumentsController : ControllerBase
 {
-    private readonly ISchemaService _schemaService;
+    private readonly IDocumentProcessingFacade _documentProcessingFacade;
 
-    public DocumentsController(ISchemaService schemaService)
+    public DocumentsController(IDocumentProcessingFacade documentProcessingFacade)
     {
-        _schemaService = schemaService;
+        _documentProcessingFacade = documentProcessingFacade;
     }
 
     [Authorize(Roles = AccessLevels.GeneralAccess)]
     [HttpPost("{workspaceId:guid}/{objectName}")]
     public async Task PostObject(string objectName, Guid workspaceId)
     {
-        var s = await _schemaService.GetSchemaObject(workspaceId, objectName);
         using var bufferStream = new MemoryStream();
         await HttpContext.Request.Body.CopyToAsync(bufferStream);
         Memory<byte> buffer = bufferStream.ToArray();
 
-        var parser = new StoredDocumentJsonParser(s);
-        var result = parser.ParseJsonToObject(buffer.Span);
+        var result = await _documentProcessingFacade.ProcessDocument(workspaceId, objectName, buffer);
     }
 }

@@ -1,18 +1,17 @@
 ﻿using System.Security.Claims;
 using Application.Mappers;
 using Application.Services;
+using Application.Validators;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.ViewModels.Schema;
 using DataAccess;
-using IdentityServer4;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NpgsqlTypes;
 using Serilog;
-using Serilog.Sinks.PostgreSQL;
 using Serilog.Sinks.PostgreSQL.ColumnWriters;
 using Log = Serilog.Log;
 
@@ -28,6 +27,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IWorkspaceService, WorkspaceService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ISchemaService, SchemaService>();
+        services.AddSingleton(new StoredDocumentValidator());
+        services.AddTransient<IDocumentProcessingFacade, DocumentProcessingFacade>();
     }
 
     public static void AddApplicationMappers(this IServiceCollection services)

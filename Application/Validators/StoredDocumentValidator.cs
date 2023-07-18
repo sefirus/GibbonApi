@@ -22,10 +22,10 @@ public class FieldValueValidator : AbstractValidator<FieldValue>
 {
     public FieldValueValidator()
     {
-        RuleFor(x => x.Value)
-            .NotEmpty()
-            .When(fieldValue => fieldValue.SchemaField.IsRequired)
-            .WithMessage("Value must not be empty");
+        // RuleFor(x => x.Value)
+        //     .NotEmpty()
+        //     .When(fieldValue => fieldValue.SchemaField.IsRequired)
+        //     .WithMessage("Value must not be empty");
 
         RuleFor(x => x)
             .Must(fieldValue =>
