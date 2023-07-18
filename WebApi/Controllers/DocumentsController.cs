@@ -9,11 +9,11 @@ namespace WebApi.Controllers;
 [Route("api/")]
 public class DocumentsController : ControllerBase
 {
-    private readonly IDocumentProcessingFacade _documentProcessingFacade;
+    private readonly IDocumentService _documentService;
 
-    public DocumentsController(IDocumentProcessingFacade documentProcessingFacade)
+    public DocumentsController(IDocumentService documentService)
     {
-        _documentProcessingFacade = documentProcessingFacade;
+        _documentService = documentService;
     }
 
     [Authorize(Roles = AccessLevels.GeneralAccess)]
@@ -24,6 +24,6 @@ public class DocumentsController : ControllerBase
         await HttpContext.Request.Body.CopyToAsync(bufferStream);
         Memory<byte> buffer = bufferStream.ToArray();
 
-        var result = await _documentProcessingFacade.ProcessDocument(workspaceId, objectName, buffer);
+        var result = await _documentService.SaveDocumentFromRequest(workspaceId, objectName, buffer);
     }
 }

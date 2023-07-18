@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ISchemaService, SchemaService>();
         services.AddSingleton(new StoredDocumentValidator());
-        services.AddTransient<IDocumentProcessingFacade, DocumentProcessingFacade>();
+        services.AddTransient<IDocumentService, DocumentService>();
     }
 
     public static void AddApplicationMappers(this IServiceCollection services)
