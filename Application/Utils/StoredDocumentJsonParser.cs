@@ -54,13 +54,16 @@ public class StoredDocumentJsonParser
             }
             reader.Read();  // move to the value
             var fieldValue = ParseValue(ref reader, storedDocument, matchingField);
-            if(fieldValue is not null) storedDocument.FieldValues.Add(fieldValue);
+            if(fieldValue is not null)
+            {
+                storedDocument.FieldValues.Add(fieldValue);
+            }
         }
     }
 
     private FieldValue? ParseValue(ref Utf8JsonReader reader,  StoredDocument storedDocument, SchemaField matchingField)
     {
-        FieldValue fieldValue = null;
+        FieldValue? fieldValue = null;
         string? value = null;
         switch (reader.TokenType)
         {
@@ -119,7 +122,10 @@ public class StoredDocumentJsonParser
             else if (DataTypesEnum.IsValueDataType(schemaArrayElement.DataTypeId))
             {
                 var value = ParseValue(ref reader, storedDocument, schemaArrayElement);
-                if(value is not null) storedDocument.FieldValues.Add(value);
+                if(value is not null)
+                {
+                    storedDocument.FieldValues.Add(value);
+                }
             }
         }
     }
