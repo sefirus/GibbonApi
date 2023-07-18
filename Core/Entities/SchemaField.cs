@@ -19,6 +19,7 @@ public class SchemaField : ICreatableEntity
     public string? Pattern { get; set; }
     public string? Summary { get; set; }
     public bool IsArray { get; set; }
+    //public bool IsRequired { get; set; }
     public List<FieldValue>? FieldValues { get; set; }
     public List<SchemaField>? ChildFields { get; set; }
     public DateTime CreatedDate { get; set; }
