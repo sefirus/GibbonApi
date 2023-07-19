@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.Services;
+using Core.ViewModels;
 using Core.ViewModels.Schema;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -77,13 +78,50 @@ public class SchemaService : ISchemaService
     
     public async Task<SchemaObject> GetSchemaObject(Guid workspaceId, string schemaObjectName)
     {
-        if (_memoryCache.TryGetValue<SchemaObject>((workspaceId, schemaObjectName), out var schemaObject))
+        var entryKey = new MemoryCacheKey()
+        {
+            WorkspaceId = workspaceId,
+            ObjectName = schemaObjectName,
+            EntryType = MemoryCacheEntryType.SchemaObject
+        };
+        if (_memoryCache.TryGetValue<SchemaObject>(entryKey, out var schemaObject))
         {
             return schemaObject!;
         }   
         schemaObject = await RetrieveSchemaObject(workspaceId, schemaObjectName);
-        _memoryCache.Set((workspaceId, schemaObjectName), schemaObject, TimeSpan.FromMinutes(15));
+        _memoryCache.Set(entryKey, schemaObject, TimeSpan.FromMinutes(15));
         return schemaObject!;
-
     }
+
+    public async Task<Dictionary<Guid, SchemaField>> GetSchemaObjectLookup(Guid workspaceId, string schemaObjectName)
+    {
+        var entryKey = new MemoryCacheKey()
+        {
+            WorkspaceId = workspaceId,
+            ObjectName = schemaObjectName,
+            EntryType = MemoryCacheEntryType.Lookup
+        };
+        if (_memoryCache.TryGetValue<Dictionary<Guid, SchemaField>>(entryKey, out var schemaObjectLookup))
+        {
+            return schemaObjectLookup!;
+        }
+
+        var schemaObject = await GetSchemaObject(workspaceId, schemaObjectName);
+        schemaObjectLookup ??= new Dictionary<Guid, SchemaField>();
+        PopulateFieldLookup(schemaObjectLookup, schemaObject.Fields);
+        _memoryCache.Set(entryKey, schemaObjectLookup, TimeSpan.FromMinutes(15));
+        return schemaObjectLookup;
+    }
+    
+    private static void PopulateFieldLookup(IDictionary<Guid, SchemaField> fieldLookup, List<SchemaField> fields)
+    {
+        foreach (var field in fields)
+        {
+            fieldLookup[field.Id] = field;
+            if (field.ChildFields != null)
+            {
+                PopulateFieldLookup(fieldLookup, field.ChildFields);
+            }
+        }
+    } 
 }
