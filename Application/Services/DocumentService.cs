@@ -4,6 +4,7 @@ using Core.Entities;
 using Core.Interfaces.Services;
 using DataAccess;
 using FluentResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
@@ -46,5 +47,19 @@ public class DocumentService : IDocumentService
         }        
         await SaveDocumentToDb(document);
         return Result.Ok(document);
+    }
+
+    public async Task<Result<StoredDocument>> RetrieveDocument(Guid workspaceId, string objectName, string primaryKeyValue)
+    {
+        var document = await _context.StoredDocuments
+            .Include(sd => sd.FieldValues)
+            .Where(sd => sd.FieldValues
+                .Any(fv => fv.SchemaFieldId == sd.PrimaryKeySchemaFieldId 
+                    && fv.Value == primaryKeyValue))
+            .SingleOrDefaultAsync();
+        var schema = await _schemaService.GetSchemaObjectLookup(workspaceId, objectName);
+        return document is null
+            ? Result.Fail<StoredDocument>("Document with given PK not found.")
+            : Result.Ok(document);
     }
 }

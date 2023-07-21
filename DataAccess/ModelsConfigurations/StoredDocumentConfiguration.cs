@@ -9,11 +9,20 @@ public class StoredDocumentConfiguration : IEntityTypeConfiguration<StoredDocume
     public void Configure(EntityTypeBuilder<StoredDocument> builder)
     {
         builder.HasKey(sd => sd.Id);
-        builder.HasOne(sd => sd.SchemaObject)
+        
+        builder
+            .HasOne(sd => sd.SchemaObject)
             .WithMany(so => so.StoredDocuments)
             .HasForeignKey(sd => sd.SchemaObjectId);
-        builder.HasMany(sd => sd.FieldValues)
+        
+        builder
+            .HasMany(sd => sd.FieldValues)
             .WithOne(fv => fv.Document)
             .HasForeignKey(fv => fv.DocumentId);
+
+        builder
+            .HasOne(sd => sd.PrimaryKeySchemaField)
+            .WithMany()
+            .HasForeignKey(sd => sd.PrimaryKeySchemaFieldId);
     }
 }
