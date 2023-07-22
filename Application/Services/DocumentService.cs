@@ -1,10 +1,12 @@
 ﻿using Application.Utils;
 using Application.Validators;
 using Core.Entities;
+using Core.Enums;
 using Core.Interfaces.Services;
 using DataAccess;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace Application.Services;
 
@@ -62,4 +64,40 @@ public class DocumentService : IDocumentService
             ? Result.Fail<StoredDocument>("Document with given PK not found.")
             : Result.Ok(document);
     }
+
+    public Result<JObject> SerializeDocument(StoredDocument document)
+    {
+        var rootObject = new JObject();
+        foreach (var fieldValue in document.FieldValues)
+        {
+            AddFieldToJObject(rootObject, fieldValue);
+        }
+        return rootObject;
+    }
+    
+    private void AddFieldToJObject(JObject parentObject, FieldValue fieldValue)
+    {
+        var schemaField = fieldValue.SchemaField;
+        if (schemaField.ParentFieldId == null)
+        {
+            parentObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataType);
+        }
+        else
+        {
+            if (parentObject[schemaField.ParentField!.FieldName] is not JObject nestedObject)
+            {
+                nestedObject = new JObject();
+                parentObject[schemaField.ParentField.FieldName] = nestedObject;
+            }
+            nestedObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataType);
+        }
+    }
+
+    private JToken ConvertValue(string value, DataType dataType) => dataType.Name switch
+    {
+        DataTypesEnum.Int => new JValue(int.Parse(value)),
+        DataTypesEnum.Float => new JValue(float.Parse(value)),
+        _ => new JValue(value)
+    };
+
 }

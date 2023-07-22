@@ -21,12 +21,14 @@ public class StoredDocumentJsonParser
 
     public StoredDocument ParseJsonToObject(ReadOnlySpan<byte> json)
     {
+        var primaryField = _schemaObject.Fields.Single(sf => sf.IsPrimaryKey);
         var storedDocument = new StoredDocument
         {
             SchemaObject = _schemaObject,
             SchemaObjectId = _schemaObject.Id,
             FieldValues = new List<FieldValue>(),
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            PrimaryKeySchemaFieldId = primaryField.Id
         };
 
         var utf8JsonReader = new Utf8JsonReader(json, _jsonReaderOptions);
