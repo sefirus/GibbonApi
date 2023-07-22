@@ -48,6 +48,8 @@ public class DocumentService : IDocumentService
             return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
         }        
         await SaveDocumentToDb(document);
+        var schemaLookup = await _schemaService.GetSchemaObjectLookup(workspaceId, objectName);
+        EnrichFieldValuesWithSchemaFields(document, schemaLookup);
         return Result.Ok(document);
     }
 
@@ -60,9 +62,23 @@ public class DocumentService : IDocumentService
                     && fv.Value == primaryKeyValue))
             .SingleOrDefaultAsync();
         var schema = await _schemaService.GetSchemaObjectLookup(workspaceId, objectName);
-        return document is null
-            ? Result.Fail<StoredDocument>("Document with given PK not found.")
-            : Result.Ok(document);
+        if (document is null)
+        {
+            return Result.Fail<StoredDocument>("Document with given PK not found.");
+        }
+        EnrichFieldValuesWithSchemaFields(document, schema);
+        return document;
+    }
+    
+    public void EnrichFieldValuesWithSchemaFields(StoredDocument document, Dictionary<Guid, SchemaField> fieldLookup)
+    {
+        foreach (var fieldValue in document.FieldValues)
+        {
+            if (fieldLookup.TryGetValue(fieldValue.SchemaFieldId, out var field))
+            {
+                fieldValue.SchemaField = field;
+            }
+        }
     }
 
     public Result<JObject> SerializeDocument(StoredDocument document)
@@ -80,7 +96,7 @@ public class DocumentService : IDocumentService
         var schemaField = fieldValue.SchemaField;
         if (schemaField.ParentFieldId == null)
         {
-            parentObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataType);
+            parentObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataTypeId);
         }
         else
         {
@@ -89,15 +105,18 @@ public class DocumentService : IDocumentService
                 nestedObject = new JObject();
                 parentObject[schemaField.ParentField.FieldName] = nestedObject;
             }
-            nestedObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataType);
+            nestedObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataTypeId);
         }
     }
 
-    private JToken ConvertValue(string value, DataType dataType) => dataType.Name switch
+    private JToken ConvertValue(string value, Guid dataTypeId)
     {
-        DataTypesEnum.Int => new JValue(int.Parse(value)),
-        DataTypesEnum.Float => new JValue(float.Parse(value)),
-        _ => new JValue(value)
-    };
-
+        if (dataTypeId == DataTypeIdsEnum.IntId)
+            return new JValue(int.Parse(value));
+        if (dataTypeId == DataTypeIdsEnum.FloatId)
+            return new JValue(float.Parse(value));
+        if (dataTypeId == DataTypeIdsEnum.BooleanId)
+            return new JValue(bool.Parse(value));
+        return new JValue(value);
+    }
 }

@@ -33,4 +33,23 @@ public class DocumentsController : ControllerBase
         var json = _documentService.SerializeDocument(result.Value);
         return Ok(json.Value);
     }
+    
+    [Authorize(Roles = AccessLevels.GeneralAccess)]
+    [HttpGet("{workspaceId:guid}/{objectName}")]
+    public async Task<IActionResult> GetObject([FromRoute]string objectName, [FromRoute]Guid workspaceId, [FromQuery]string? pkValue)
+    {
+        if (pkValue is not null)
+        {
+            var documentResult = await _documentService.RetrieveDocument(workspaceId, objectName, pkValue);
+            if (!documentResult.IsSuccess)
+            {
+                return NotFound();
+            }
+            var json = _documentService.SerializeDocument(documentResult.Value);
+            return Ok(json.Value);
+
+        }
+
+        return BadRequest();
+    }
 }
