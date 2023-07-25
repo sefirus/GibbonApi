@@ -11,10 +11,7 @@ public static class DataTypesEnum
     public const string ObjectId = "ObjectId";
     public const string Uuid = "Uuid";
     public const string Object = "Object";
-
-    /// <summary>
-    /// DataType for array. Requires NestedType
-    /// </summary>
+    public const string Boolean = "Boolean";
     public const string Array = "Array";
 
     public static string? GetDataType(string? argument)
@@ -35,6 +32,8 @@ public static class DataTypesEnum
             return Object;
         if (lowercaseArgument == Array.ToLower())
             return Array;
+        if (lowercaseArgument == Boolean.ToLower())
+            return Boolean;
 
         switch (lowercaseArgument)
         {
@@ -52,6 +51,8 @@ public static class DataTypesEnum
                 return Object;
             case "arr" or "array":
                 return Array;
+            case "bool" or "b":
+                return Boolean;
             default:
                 // No match found
                 return null;
@@ -66,8 +67,9 @@ public static class DataTypesEnum
         new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"), Name = ObjectId, },
         new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000005"), Name = Uuid, },
         new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000006"), Name = Object, },
-        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000007"), Name = Array, }
-    };
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000007"), Name = Array, },
+        new DataType { Id = Guid.Parse("00000000-0000-0000-0000-000000000008"), Name = Boolean, } 
+};
 
     public static DataType GetDataTypeObject(SchemaFieldViewModel fieldViewModel)
     {
@@ -111,4 +113,5 @@ public static class DataTypeIdsEnum
     public static readonly Guid UuidId = Guid.Parse("00000000-0000-0000-0000-000000000005");
     public static readonly Guid ObjectId = Guid.Parse("00000000-0000-0000-0000-000000000006");
     public static readonly Guid ArrayId = Guid.Parse("00000000-0000-0000-0000-000000000007");
+    public static readonly Guid BooleanId = Guid.Parse("00000000-0000-0000-0000-000000000008");
 }

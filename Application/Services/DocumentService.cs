@@ -1,9 +1,12 @@
 ﻿using Application.Utils;
 using Application.Validators;
 using Core.Entities;
+using Core.Enums;
 using Core.Interfaces.Services;
 using DataAccess;
 using FluentResults;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace Application.Services;
 
@@ -45,6 +48,88 @@ public class DocumentService : IDocumentService
             return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
         }        
         await SaveDocumentToDb(document);
+        await EnrichStoredDocumentWithSchema(document, workspaceId, objectName, schemaObject);
         return Result.Ok(document);
+    }
+
+    public async Task<Result<StoredDocument>> RetrieveDocument(Guid workspaceId, string objectName, string primaryKeyValue)
+    {
+        var document = await _context.StoredDocuments
+            .Include(sd => sd.FieldValues)
+            .Where(sd => sd.FieldValues
+                .Any(fv => fv.SchemaFieldId == sd.PrimaryKeySchemaFieldId 
+                    && fv.Value == primaryKeyValue))
+            .SingleOrDefaultAsync();
+        if (document is null)
+        {
+            return Result.Fail<StoredDocument>("Document with given PK not found.");
+        }
+
+        await EnrichStoredDocumentWithSchema(document, workspaceId, objectName);
+        return document;
+    }
+
+    public async Task<StoredDocument> EnrichStoredDocumentWithSchema(StoredDocument document, Guid workspaceId, string objectName, SchemaObject? schema=null)
+    {
+        schema ??= await _schemaService.GetSchemaObject(workspaceId, objectName);
+        document.SchemaObject = schema;
+        var schemaObjectLookup = await _schemaService.GetSchemaObjectLookup(workspaceId, objectName);
+        EnrichFieldValuesWithSchemaFields(document, schemaObjectLookup);
+        return document;
+    }
+    
+    private void EnrichFieldValuesWithSchemaFields(StoredDocument document, Dictionary<Guid, SchemaField> fieldLookup)
+    {
+        foreach (var fieldValue in document.FieldValues)
+        {
+            if (fieldLookup.TryGetValue(fieldValue.SchemaFieldId, out var field))
+            {
+                fieldValue.SchemaField = field;
+            }
+        }
+    }
+
+    public Result<JObject> SerializeDocument(StoredDocument document)
+    {
+        var schema = document.SchemaObject;
+        if (schema is null)
+        {
+            return Result.Fail("Empty schema passed");
+        }
+        var rootObject = new JObject();
+        foreach (var fieldValue in document.FieldValues)
+        {
+            AddFieldToJObject(rootObject, fieldValue);
+        }
+        return rootObject;
+    }
+    
+    private void AddFieldToJObject(JObject parentObject, FieldValue fieldValue)
+    {
+        var schemaField = fieldValue.SchemaField;
+        if (schemaField.ParentFieldId == null)
+        {
+            parentObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataTypeId);
+        }
+        else
+        {
+            if (parentObject[schemaField.ParentField!.FieldName] is not JObject nestedObject)
+            {
+                nestedObject = new JObject();
+                parentObject[schemaField.ParentField.FieldName] = nestedObject;
+            }
+            nestedObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataTypeId);
+        }
+    }
+
+    private JToken ConvertValue(string value, Guid dataTypeId)
+    {
+        if (dataTypeId == DataTypeIdsEnum.IntId)
+            return new JValue(int.Parse(value));
+        if (dataTypeId == DataTypeIdsEnum.FloatId)
+            return new JValue(float.Parse(value));
+        if (dataTypeId == DataTypeIdsEnum.BooleanId)
+            return new JValue(bool.Parse(value));
+        return new JValue(value);
     }
 }
