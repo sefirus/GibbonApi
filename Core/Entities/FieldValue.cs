@@ -7,5 +7,9 @@ public class FieldValue
     public StoredDocument Document { get; set; }
     public Guid SchemaFieldId { get; set; }
     public SchemaField SchemaField { get; set; }
+    public Guid? ParentFieldId { get; set; }
+    public FieldValue? ParentField { get; set; }
+
+    public List<FieldValue>? ChildFields { get; set; }
     public string Value { get; set; }
 }

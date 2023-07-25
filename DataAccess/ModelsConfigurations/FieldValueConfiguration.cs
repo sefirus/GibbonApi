@@ -10,11 +10,20 @@ public class FieldValueConfiguration : IEntityTypeConfiguration<FieldValue>
     {
         builder.HasKey(fv => fv.Id);
         builder.Property(fv => fv.Value).IsRequired();
-        builder.HasOne(fv => fv.Document)
+        builder
+            .HasOne(fv => fv.Document)
             .WithMany(d => d.FieldValues)
             .HasForeignKey(fv => fv.DocumentId);
-        builder.HasOne(fv => fv.SchemaField)
+        
+        builder
+            .HasOne(fv => fv.SchemaField)
             .WithMany(sf => sf.FieldValues)
             .HasForeignKey(fv => fv.SchemaFieldId);
+
+        builder
+            .HasOne(fv => fv.ParentField)
+            .WithMany(fv => fv.ChildFields)
+            .HasForeignKey(fv => fv.ParentFieldId)
+            .IsRequired(false);
     }
 }
