@@ -48,8 +48,7 @@ public class DocumentService : IDocumentService
             return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
         }        
         await SaveDocumentToDb(document);
-        var schemaLookup = await _schemaService.GetSchemaObjectLookup(workspaceId, objectName);
-        EnrichFieldValuesWithSchemaFields(document, schemaLookup);
+        await EnrichStoredDocumentWithSchema(document, workspaceId, objectName, schemaObject);
         return Result.Ok(document);
     }
 
@@ -61,16 +60,25 @@ public class DocumentService : IDocumentService
                 .Any(fv => fv.SchemaFieldId == sd.PrimaryKeySchemaFieldId 
                     && fv.Value == primaryKeyValue))
             .SingleOrDefaultAsync();
-        var schema = await _schemaService.GetSchemaObjectLookup(workspaceId, objectName);
         if (document is null)
         {
             return Result.Fail<StoredDocument>("Document with given PK not found.");
         }
-        EnrichFieldValuesWithSchemaFields(document, schema);
+
+        await EnrichStoredDocumentWithSchema(document, workspaceId, objectName);
+        return document;
+    }
+
+    public async Task<StoredDocument> EnrichStoredDocumentWithSchema(StoredDocument document, Guid workspaceId, string objectName, SchemaObject? schema=null)
+    {
+        schema ??= await _schemaService.GetSchemaObject(workspaceId, objectName);
+        document.SchemaObject = schema;
+        var schemaObjectLookup = await _schemaService.GetSchemaObjectLookup(workspaceId, objectName);
+        EnrichFieldValuesWithSchemaFields(document, schemaObjectLookup);
         return document;
     }
     
-    public void EnrichFieldValuesWithSchemaFields(StoredDocument document, Dictionary<Guid, SchemaField> fieldLookup)
+    private void EnrichFieldValuesWithSchemaFields(StoredDocument document, Dictionary<Guid, SchemaField> fieldLookup)
     {
         foreach (var fieldValue in document.FieldValues)
         {
@@ -83,6 +91,11 @@ public class DocumentService : IDocumentService
 
     public Result<JObject> SerializeDocument(StoredDocument document)
     {
+        var schema = document.SchemaObject;
+        if (schema is null)
+        {
+            return Result.Fail("Empty schema passed");
+        }
         var rootObject = new JObject();
         foreach (var fieldValue in document.FieldValues)
         {
