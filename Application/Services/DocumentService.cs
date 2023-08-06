@@ -39,7 +39,7 @@ public class DocumentService : IDocumentService
     {
         var schemaObject = await _schemaService.GetSchemaObject(workspaceId, objectName);
         var parser = new StoredDocumentJsonParser(schemaObject);
-        var document = parser.ParseJsonToObject(buffer.Span);
+        var document = parser.ParseJsonToStoredDocument(buffer.Span);
 
         var validationResult = await _documentValidator.ValidateAsync(document);
 

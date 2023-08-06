@@ -2,12 +2,17 @@
 using System.Text.Json;
 using Core.Entities;
 using Core.Enums;
+using FluentResults;
 
 namespace Application.Utils;
 
 public class StoredDocumentJsonParser
 {
     private readonly SchemaObject _schemaObject;
+    public StoredDocument StoredDocument { get; }
+
+    private const string ValueIsNullErrorMessage = "Some of the FieldValues appeared to be null";
+    
     private readonly JsonReaderOptions _jsonReaderOptions = new()
     {
         AllowTrailingCommas = true,
@@ -16,13 +21,9 @@ public class StoredDocumentJsonParser
 
     public StoredDocumentJsonParser(SchemaObject schemaObject)
     {
-        _schemaObject = schemaObject;
-    }
-
-    public StoredDocument ParseJsonToObject(ReadOnlySpan<byte> json)
-    {
+        _schemaObject = schemaObject; 
         var primaryField = _schemaObject.Fields.Single(sf => sf.IsPrimaryKey);
-        var storedDocument = new StoredDocument
+        StoredDocument = new StoredDocument
         {
             SchemaObject = _schemaObject,
             SchemaObjectId = _schemaObject.Id,
@@ -30,16 +31,18 @@ public class StoredDocumentJsonParser
             Id = Guid.NewGuid(),
             PrimaryKeySchemaFieldId = primaryField.Id
         };
-
-        var utf8JsonReader = new Utf8JsonReader(json, _jsonReaderOptions);
-
-        ParseObject(ref utf8JsonReader, storedDocument, _schemaObject.Fields);
-
-        return storedDocument;
     }
 
-    private void ParseObject(ref Utf8JsonReader reader, StoredDocument storedDocument, List<SchemaField> objectFields)
+    public StoredDocument ParseJsonToStoredDocument(ReadOnlySpan<byte> json)
     {
+        var utf8JsonReader = new Utf8JsonReader(json, _jsonReaderOptions);
+        ParseObject(ref utf8JsonReader, _schemaObject.Fields);
+        return StoredDocument;
+    }
+
+    private Result<IList<FieldValue>> ParseObject(ref Utf8JsonReader reader, List<SchemaField> objectFields, FieldValue? parentValue = null)
+    {
+        var fields = new List<FieldValue>(objectFields.Count);
         while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
             if (reader.TokenType != JsonTokenType.PropertyName)
@@ -55,15 +58,31 @@ public class StoredDocumentJsonParser
                 continue;
             }
             reader.Read();  // move to the value
-            var fieldValue = ParseValue(ref reader, storedDocument, matchingField);
-            if(fieldValue is not null)
+            var fieldValue = ParseValue(ref reader, matchingField);
+            if(fieldValue.IsSuccess)
             {
-                storedDocument.FieldValues.Add(fieldValue);
+                fields.Add(fieldValue.Value);
+            }
+            else
+            {
+                return Result.Fail(fieldValue.Errors);
             }
         }
-    }
 
-    private FieldValue? ParseValue(ref Utf8JsonReader reader,  StoredDocument storedDocument, SchemaField matchingField)
+        return fields;
+    }
+    
+    private FieldValue GetNewFieldValue(SchemaField matchingField) => new FieldValue
+    {
+        Id = Guid.NewGuid(),
+        Document = StoredDocument,
+        DocumentId = StoredDocument.Id,
+        SchemaField = matchingField,
+        SchemaFieldId = matchingField.Id,
+        ChildFields = new()
+    };
+
+    private Result<FieldValue> ParseValue(ref Utf8JsonReader reader, SchemaField matchingField)
     {
         FieldValue? fieldValue = null;
         string? value = null;
@@ -83,25 +102,21 @@ public class StoredDocumentJsonParser
                 value = reader.GetString();
                 break;
             case JsonTokenType.StartObject:
-                ParseObject(ref reader, storedDocument, matchingField.ChildFields);
-                break;
+                var childValuesResult = ParseObject(ref reader, matchingField.ChildFields);
+                var startObject = GetNewFieldValue(matchingField);
+                if (childValuesResult.IsSuccess)
+                {
+                    startObject.ChildFields.AddRange(childValuesResult.Value);
+                }
+                return startObject;
             case JsonTokenType.StartArray:
-                ParseArray(ref reader, storedDocument, matchingField);
+                ParseArray(ref reader, StoredDocument, matchingField);
                 break;
         }
 
-        if (value is not null)
-        {
-            fieldValue = new FieldValue
-            {
-                Id = Guid.NewGuid(),
-                Document = storedDocument,
-                DocumentId = storedDocument.Id,
-                SchemaField = matchingField,
-                SchemaFieldId = matchingField.Id,
-                Value = value  // you will need to handle different value types here
-            };
-        }
+        if (value is null) return Result.Fail<FieldValue>(ValueIsNullErrorMessage);
+        fieldValue = GetNewFieldValue(matchingField);
+        fieldValue.Value = value;
         return fieldValue;
     }
 
@@ -113,20 +128,20 @@ public class StoredDocumentJsonParser
             if (schemaArrayElement.DataTypeId == DataTypeIdsEnum.ObjectId 
                 && reader.TokenType == JsonTokenType.StartObject)
             {
-                ParseObject(ref reader, storedDocument, schemaArrayElement.ChildFields!);
+                ParseObject(ref reader, schemaArrayElement.ChildFields!);
             } 
             
             else if (schemaArrayElement.DataTypeId == DataTypeIdsEnum.ArrayId 
                 && reader.TokenType == JsonTokenType.StartArray)
             {
-                ParseObject(ref reader, storedDocument, schemaArrayElement.ChildFields!);
+                ParseObject(ref reader, schemaArrayElement.ChildFields!);
             }
             else if (DataTypesEnum.IsValueDataType(schemaArrayElement.DataTypeId))
             {
-                var value = ParseValue(ref reader, storedDocument, schemaArrayElement);
+                var value = ParseValue(ref reader, schemaArrayElement);
                 if(value is not null)
                 {
-                    storedDocument.FieldValues.Add(value);
+                    storedDocument.FieldValues.Add(value.Value);
                 }
             }
         }
