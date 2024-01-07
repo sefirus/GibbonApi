@@ -1,9 +1,10 @@
 ﻿using Core.Entities;
 using Core.ViewModels.User;
+using FluentResults;
 
 namespace Core.Interfaces.Services;
 
 public interface IUserService
 {
-    Task<User> RegisterUserAsync(RegisterUserViewModel model);
+    Task<Result<User>> RegisterUserAsync(RegisterUserViewModel model);
 }

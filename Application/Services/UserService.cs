@@ -3,6 +3,7 @@ using Core.Enums;
 using Core.Interfaces.Services;
 using Core.ViewModels.User;
 using DataAccess;
+using FluentResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,14 +19,15 @@ public class UserService : IUserService
         _context = context;
     }
     
-    public async Task<User> RegisterUserAsync(RegisterUserViewModel model)
+    public async Task<Result<User>> RegisterUserAsync(RegisterUserViewModel model)
     {
-        var role = await _context.Roles.SingleOrDefaultAsync(r => r.Name == RolesEnum.RegularUser);
-        if (role == null)
+        var isEmailTaken = await _context.Users.AnyAsync(u => u.Email == model.Email);
+        if (isEmailTaken)
         {
-            throw new Exception("Role RegularUser not found");
+            return Result.Fail($"Email {model.Email} is already taken");
         }
-
+        
+        var role = await _context.Roles.SingleAsync(r => r.Name == RolesEnum.RegularUser);
         var user = new User
         {
             Email = model.Email,
