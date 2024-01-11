@@ -33,16 +33,22 @@ public class StoredDocumentJsonParser
         };
     }
 
-    public StoredDocument ParseJsonToStoredDocument(ReadOnlySpan<byte> json)
+    public Result<StoredDocument> ParseJsonToStoredDocument(ReadOnlySpan<byte> json)
     {
         var utf8JsonReader = new Utf8JsonReader(json, _jsonReaderOptions);
-        ParseObject(ref utf8JsonReader, _schemaObject.Fields);
+        var fieldValues = ParseObject(ref utf8JsonReader, _schemaObject.Fields);
+        if (!fieldValues.IsSuccess)
+        {
+            return Result.Fail<StoredDocument>(fieldValues.Errors);
+        }
+
+        StoredDocument.FieldValues = fieldValues.Value;
         return StoredDocument;
     }
 
-    private Result<IList<FieldValue>> ParseObject(ref Utf8JsonReader reader, List<SchemaField> objectFields, FieldValue? parentValue = null)
+    private Result<IEnumerable<FieldValue>> ParseObject(ref Utf8JsonReader reader, List<SchemaField> objectFields, FieldValue? parentValue = null)
     {
-        var fields = new List<FieldValue>(objectFields.Count);
+        var fields = new LinkedList<FieldValue>();
         while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
             if (reader.TokenType != JsonTokenType.PropertyName)
@@ -50,8 +56,7 @@ public class StoredDocumentJsonParser
                 continue;
             }
             var propertyName = reader.GetString();
-            var matchingField = objectFields.FirstOrDefault(
-                field => string.Equals(field.FieldName, propertyName));
+            var matchingField = objectFields.FirstOrDefault(field => string.Equals(field.FieldName, propertyName));
 
             if (matchingField == null)
             {
@@ -61,7 +66,7 @@ public class StoredDocumentJsonParser
             var fieldValue = ParseValue(ref reader, matchingField);
             if(fieldValue.IsSuccess)
             {
-                fields.Add(fieldValue.Value);
+                fields.AddLast(fieldValue.Value);
             }
             else
             {
@@ -72,15 +77,25 @@ public class StoredDocumentJsonParser
         return fields;
     }
     
-    private FieldValue GetNewFieldValue(SchemaField matchingField) => new FieldValue
+    private FieldValue GetNewFieldValue(SchemaField matchingField, string? valueType = null)
     {
-        Id = Guid.NewGuid(),
-        Document = StoredDocument,
-        DocumentId = StoredDocument.Id,
-        SchemaField = matchingField,
-        SchemaFieldId = matchingField.Id,
-        ChildFields = new()
-    };
+        var newValue = new FieldValue
+        {
+            Id = Guid.NewGuid(),
+            Document = StoredDocument,
+            DocumentId = StoredDocument.Id,
+            SchemaField = matchingField,
+            SchemaFieldId = matchingField.Id,
+        };
+        newValue.Value = valueType switch
+        {
+            FieldValueEnum.StartObject => FieldValueEnum.StartObject,
+            FieldValueEnum.StartArray => FieldValueEnum.StartArray,
+            _ => newValue.Value
+        };
+
+        return newValue;
+    }
 
     private Result<FieldValue> ParseValue(ref Utf8JsonReader reader, SchemaField matchingField)
     {
@@ -103,47 +118,69 @@ public class StoredDocumentJsonParser
                 break;
             case JsonTokenType.StartObject:
                 var childValuesResult = ParseObject(ref reader, matchingField.ChildFields);
-                var startObject = GetNewFieldValue(matchingField);
-                if (childValuesResult.IsSuccess)
+                var startObject = GetNewFieldValue(matchingField, FieldValueEnum.StartObject);
+                if (!childValuesResult.IsSuccess)
                 {
-                    startObject.ChildFields.AddRange(childValuesResult.Value);
+                    return Result.Fail<FieldValue>(childValuesResult.Errors);
                 }
+                startObject.ChildFields = childValuesResult.Value;
                 return startObject;
             case JsonTokenType.StartArray:
-                ParseArray(ref reader, StoredDocument, matchingField);
-                break;
+                var arrayValuesResult = ParseArray(ref reader, StoredDocument, matchingField);
+                var startArray = GetNewFieldValue(matchingField, FieldValueEnum.StartArray);
+                if (!arrayValuesResult.IsSuccess)
+                {
+                    return Result.Fail<FieldValue>(arrayValuesResult.Errors);
+                }
+                startArray.ChildFields = arrayValuesResult.Value;
+                return startArray;
         }
-
-        if (value is null) return Result.Fail<FieldValue>(ValueIsNullErrorMessage);
         fieldValue = GetNewFieldValue(matchingField);
         fieldValue.Value = value;
         return fieldValue;
     }
 
-    private void ParseArray(ref Utf8JsonReader reader, StoredDocument storedDocument, SchemaField arrayField)
+    private Result<IEnumerable<FieldValue>> ParseArray(ref Utf8JsonReader reader, StoredDocument storedDocument, SchemaField arrayField)
     {
         var schemaArrayElement = arrayField.ChildFields!.Single();
+        var resultValues = new LinkedList<FieldValue>();
         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
         {
             if (schemaArrayElement.DataTypeId == DataTypeIdsEnum.ObjectId 
                 && reader.TokenType == JsonTokenType.StartObject)
             {
-                ParseObject(ref reader, schemaArrayElement.ChildFields!);
-            } 
-            
+                var startObject = GetNewFieldValue(schemaArrayElement, FieldValueEnum.StartObject);
+                var childValuesResult = ParseObject(ref reader, schemaArrayElement.ChildFields!);
+                if (!childValuesResult.IsSuccess)
+                {
+                    return Result.Fail<IEnumerable<FieldValue>>(childValuesResult.Errors);
+                }
+                startObject.ChildFields = childValuesResult.Value;
+                resultValues.AddLast(startObject);
+            }
             else if (schemaArrayElement.DataTypeId == DataTypeIdsEnum.ArrayId 
-                && reader.TokenType == JsonTokenType.StartArray)
+                     && reader.TokenType == JsonTokenType.StartArray)
             {
-                ParseObject(ref reader, schemaArrayElement.ChildFields!);
+                var arrayValuesResult = ParseArray(ref reader, storedDocument, schemaArrayElement);
+                var startArray = GetNewFieldValue(schemaArrayElement, FieldValueEnum.StartArray);
+                if (!arrayValuesResult.IsSuccess)
+                {
+                    return Result.Fail<IEnumerable<FieldValue>>(arrayValuesResult.Errors);
+                }
+                startArray.ChildFields = arrayValuesResult.Value;
+                resultValues.AddLast(startArray);
             }
             else if (DataTypesEnum.IsValueDataType(schemaArrayElement.DataTypeId))
             {
                 var value = ParseValue(ref reader, schemaArrayElement);
-                if(value is not null)
+                if (!value.IsSuccess)
                 {
-                    storedDocument.FieldValues.Add(value.Value);
+                    return Result.Fail<IEnumerable<FieldValue>>(value.Errors);
                 }
+                resultValues.AddLast(value.Value);
             }
         }
+
+        return resultValues;
     }
 }

@@ -4,13 +4,13 @@ using Core.Enums;
 using FluentValidation;
 
 namespace Application.Validators;
-
+//TODO: Fix for new strategy with parent values
 public class StoredDocumentValidator : AbstractValidator<StoredDocument>
 {
     public StoredDocumentValidator()
     {
         RuleFor(x => x.FieldValues)
-            .Must(list => list != null && list.Count > 0)
+            .Must(list => list != null && list.Count() > 0)
             .WithMessage("FieldValues must not be null or empty");
 
         RuleForEach(x => x.FieldValues)

@@ -29,7 +29,11 @@ public class DocumentService : IDocumentService
     public async Task SaveDocumentToDb(StoredDocument document)
     {
         document.SchemaObject = null;
-        document.FieldValues.ForEach(fv => fv.SchemaField = null);
+        //TODO: make this resetting recursive, to eliminate all the nested stuff
+        foreach (var fv in document.FieldValues)
+        {
+            fv.SchemaField = null;
+        }
         await _context.AddAsync(document);
         await _context.AddRangeAsync(document.FieldValues);
         await _context.SaveChangesAsync();
@@ -40,16 +44,20 @@ public class DocumentService : IDocumentService
         var schemaObject = await _schemaService.GetSchemaObject(workspaceId, objectName);
         var parser = new StoredDocumentJsonParser(schemaObject);
         var document = parser.ParseJsonToStoredDocument(buffer.Span);
-
-        var validationResult = await _documentValidator.ValidateAsync(document);
-
-        if (!validationResult.IsValid)
+        if (!document.IsSuccess)
         {
-            return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
-        }        
-        await SaveDocumentToDb(document);
-        await EnrichStoredDocumentWithSchema(document, workspaceId, objectName, schemaObject);
-        return Result.Ok(document);
+            return Result.Fail<StoredDocument>(document.Errors);
+        }
+
+        // var validationResult = await _documentValidator.ValidateAsync(document.Value);
+        //
+        // if (!validationResult.IsValid)
+        // {
+        //     return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
+        // }        
+        await SaveDocumentToDb(document.Value);
+        await EnrichStoredDocumentWithSchema(document.Value, workspaceId, objectName, schemaObject);
+        return Result.Ok(document.Value);
     }
 
     public async Task<Result<StoredDocument>> RetrieveDocument(Guid workspaceId, string objectName, string primaryKeyValue)

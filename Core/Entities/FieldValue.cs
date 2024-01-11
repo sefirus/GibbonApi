@@ -10,6 +10,6 @@ public class FieldValue
     public Guid? ParentFieldId { get; set; }
     public FieldValue? ParentField { get; set; }
 
-    public List<FieldValue>? ChildFields { get; set; }
+    public IEnumerable<FieldValue>? ChildFields { get; set; }
     public string Value { get; set; }
 }
