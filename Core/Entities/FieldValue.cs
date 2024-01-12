@@ -9,7 +9,6 @@ public class FieldValue
     public SchemaField SchemaField { get; set; }
     public Guid? ParentFieldId { get; set; }
     public FieldValue? ParentField { get; set; }
-
     public IEnumerable<FieldValue>? ChildFields { get; set; }
     public string Value { get; set; }
 }

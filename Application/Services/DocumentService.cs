@@ -26,13 +26,25 @@ public class DocumentService : IDocumentService
         _documentValidator = documentValidator;
     }
 
+    private static void ResetSchemaFieldRecursive(FieldValue fieldValue)
+    {
+        fieldValue.SchemaField = null;
+        if (fieldValue.ChildFields == null)
+        {
+            return;
+        }
+        foreach (var childFieldValue in fieldValue.ChildFields)
+        {
+            ResetSchemaFieldRecursive(childFieldValue);
+        }
+    }
+    
     public async Task SaveDocumentToDb(StoredDocument document)
     {
         document.SchemaObject = null;
-        //TODO: make this resetting recursive, to eliminate all the nested stuff
         foreach (var fv in document.FieldValues)
         {
-            fv.SchemaField = null;
+            ResetSchemaFieldRecursive(fv);
         }
         await _context.AddAsync(document);
         await _context.AddRangeAsync(document.FieldValues);
