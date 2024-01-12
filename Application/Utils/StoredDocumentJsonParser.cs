@@ -137,6 +137,7 @@ public class StoredDocumentJsonParser
         }
         fieldValue = GetNewFieldValue(matchingField);
         fieldValue.Value = value;
+        fieldValue.SchemaField = matchingField;
         return fieldValue;
     }
 

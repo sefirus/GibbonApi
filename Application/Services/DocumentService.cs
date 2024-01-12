@@ -49,12 +49,12 @@ public class DocumentService : IDocumentService
             return Result.Fail<StoredDocument>(document.Errors);
         }
 
-        // var validationResult = await _documentValidator.ValidateAsync(document.Value);
-        //
-        // if (!validationResult.IsValid)
-        // {
-        //     return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
-        // }        
+        var validationResult = await _documentValidator.ValidateAsync(document.Value);
+        
+        if (!validationResult.IsValid)
+        { 
+            return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
+        }        
         await SaveDocumentToDb(document.Value);
         await EnrichStoredDocumentWithSchema(document.Value, workspaceId, objectName, schemaObject);
         return Result.Ok(document.Value);
