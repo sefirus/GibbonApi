@@ -4,13 +4,12 @@ using Core.Enums;
 using FluentValidation;
 
 namespace Application.Validators;
-
 public class StoredDocumentValidator : AbstractValidator<StoredDocument>
 {
     public StoredDocumentValidator()
     {
         RuleFor(x => x.FieldValues)
-            .Must(list => list != null && list.Count > 0)
+            .Must(list => list != null && list.Any())
             .WithMessage("FieldValues must not be null or empty");
 
         RuleForEach(x => x.FieldValues)
@@ -22,10 +21,6 @@ public class FieldValueValidator : AbstractValidator<FieldValue>
 {
     public FieldValueValidator()
     {
-        // RuleFor(x => x.Value)
-        //     .NotEmpty()
-        //     .When(fieldValue => fieldValue.SchemaField.IsRequired)
-        //     .WithMessage("Value must not be empty");
 
         RuleFor(x => x)
             .Must(fieldValue =>
@@ -45,8 +40,11 @@ public class FieldValueValidator : AbstractValidator<FieldValue>
                     case var g when g == DataTypeIdsEnum.UuidId:
                         return ValidateUuid(fieldValue);
                     case var g when g == DataTypeIdsEnum.ObjectId_Id:
-                        // Add logic to validate ObjectId
-                        return true;
+                        return ValidateObjectId(fieldValue);
+                    case var g when g == DataTypeIdsEnum.ArrayId:
+                        return fieldValue.Value == FieldValueEnum.StartArray;
+                    case var g when g == DataTypeIdsEnum.ObjectId:
+                        return fieldValue.Value == FieldValueEnum.StartObject;
                     default:
                         return false;
                 }
@@ -84,5 +82,15 @@ public class FieldValueValidator : AbstractValidator<FieldValue>
     private static bool ValidateUuid(FieldValue fieldValue)
     {
         return Guid.TryParse(fieldValue.Value, out _);
+    }
+    
+    private static bool ValidateObjectId(FieldValue fieldValue)
+    {
+        if (string.IsNullOrEmpty(fieldValue.Value) || fieldValue.Value.Length != 24)
+        {
+            return false;
+        }
+
+        return fieldValue.Value.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F');
     }
 }

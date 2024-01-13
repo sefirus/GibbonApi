@@ -16,8 +16,17 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("register")]
-    public async Task Register(RegisterUserViewModel model)
+    public async Task<IActionResult> Register(RegisterUserViewModel model)
     {
         var result = await _userService.RegisterUserAsync(model);
+        if (result.IsFailed)
+        {
+            return BadRequest(new
+            {
+                ErrorMessage = result.Errors.FirstOrDefault()?.Message
+            });
+        }
+
+        return Ok();
     }
 }

@@ -22,4 +22,10 @@ public static class RolesEnum
     /// Permissions to read-write operations on the Workspace
     /// </summary>
     public const string General = "General";
+    /// <summary>
+    /// To remove the role from the user
+    /// </summary>
+    public const string None = "None";
+
+    public static List<string> WorkspaceRoles = new (){ Owner, Admin, General };
 }

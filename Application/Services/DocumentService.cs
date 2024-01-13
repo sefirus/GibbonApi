@@ -26,10 +26,26 @@ public class DocumentService : IDocumentService
         _documentValidator = documentValidator;
     }
 
+    private static void ResetSchemaFieldRecursive(FieldValue fieldValue)
+    {
+        fieldValue.SchemaField = null;
+        if (fieldValue.ChildFields == null)
+        {
+            return;
+        }
+        foreach (var childFieldValue in fieldValue.ChildFields)
+        {
+            ResetSchemaFieldRecursive(childFieldValue);
+        }
+    }
+    
     public async Task SaveDocumentToDb(StoredDocument document)
     {
         document.SchemaObject = null;
-        document.FieldValues.ForEach(fv => fv.SchemaField = null);
+        foreach (var fv in document.FieldValues)
+        {
+            ResetSchemaFieldRecursive(fv);
+        }
         await _context.AddAsync(document);
         await _context.AddRangeAsync(document.FieldValues);
         await _context.SaveChangesAsync();
@@ -39,17 +55,21 @@ public class DocumentService : IDocumentService
     {
         var schemaObject = await _schemaService.GetSchemaObject(workspaceId, objectName);
         var parser = new StoredDocumentJsonParser(schemaObject);
-        var document = parser.ParseJsonToObject(buffer.Span);
-
-        var validationResult = await _documentValidator.ValidateAsync(document);
-
-        if (!validationResult.IsValid)
+        var document = parser.ParseJsonToStoredDocument(buffer.Span);
+        if (!document.IsSuccess)
         {
+            return Result.Fail<StoredDocument>(document.Errors);
+        }
+
+        var validationResult = await _documentValidator.ValidateAsync(document.Value);
+        
+        if (!validationResult.IsValid)
+        { 
             return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
         }        
-        await SaveDocumentToDb(document);
-        await EnrichStoredDocumentWithSchema(document, workspaceId, objectName, schemaObject);
-        return Result.Ok(document);
+        await SaveDocumentToDb(document.Value);
+        await EnrichStoredDocumentWithSchema(document.Value, workspaceId, objectName, schemaObject);
+        return Result.Ok(document.Value);
     }
 
     public async Task<Result<StoredDocument>> RetrieveDocument(Guid workspaceId, string objectName, string primaryKeyValue)
@@ -87,49 +107,5 @@ public class DocumentService : IDocumentService
                 fieldValue.SchemaField = field;
             }
         }
-    }
-
-    public Result<JObject> SerializeDocument(StoredDocument document)
-    {
-        var schema = document.SchemaObject;
-        if (schema is null)
-        {
-            return Result.Fail("Empty schema passed");
-        }
-        var rootObject = new JObject();
-        foreach (var fieldValue in document.FieldValues)
-        {
-            AddFieldToJObject(rootObject, fieldValue);
-        }
-        return rootObject;
-    }
-    
-    private void AddFieldToJObject(JObject parentObject, FieldValue fieldValue)
-    {
-        var schemaField = fieldValue.SchemaField;
-        if (schemaField.ParentFieldId == null)
-        {
-            parentObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataTypeId);
-        }
-        else
-        {
-            if (parentObject[schemaField.ParentField!.FieldName] is not JObject nestedObject)
-            {
-                nestedObject = new JObject();
-                parentObject[schemaField.ParentField.FieldName] = nestedObject;
-            }
-            nestedObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataTypeId);
-        }
-    }
-
-    private JToken ConvertValue(string value, Guid dataTypeId)
-    {
-        if (dataTypeId == DataTypeIdsEnum.IntId)
-            return new JValue(int.Parse(value));
-        if (dataTypeId == DataTypeIdsEnum.FloatId)
-            return new JValue(float.Parse(value));
-        if (dataTypeId == DataTypeIdsEnum.BooleanId)
-            return new JValue(bool.Parse(value));
-        return new JValue(value);
     }
 }
