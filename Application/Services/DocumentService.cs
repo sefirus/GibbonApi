@@ -108,48 +108,4 @@ public class DocumentService : IDocumentService
             }
         }
     }
-
-    public Result<JObject> SerializeDocument(StoredDocument document)
-    {
-        var schema = document.SchemaObject;
-        if (schema is null)
-        {
-            return Result.Fail("Empty schema passed");
-        }
-        var rootObject = new JObject();
-        foreach (var fieldValue in document.FieldValues)
-        {
-            AddFieldToJObject(rootObject, fieldValue);
-        }
-        return rootObject;
-    }
-    
-    private void AddFieldToJObject(JObject parentObject, FieldValue fieldValue)
-    {
-        var schemaField = fieldValue.SchemaField;
-        if (schemaField.ParentFieldId == null)
-        {
-            parentObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataTypeId);
-        }
-        else
-        {
-            if (parentObject[schemaField.ParentField!.FieldName] is not JObject nestedObject)
-            {
-                nestedObject = new JObject();
-                parentObject[schemaField.ParentField.FieldName] = nestedObject;
-            }
-            nestedObject[schemaField.FieldName] = ConvertValue(fieldValue.Value, schemaField.DataTypeId);
-        }
-    }
-
-    private JToken ConvertValue(string value, Guid dataTypeId)
-    {
-        if (dataTypeId == DataTypeIdsEnum.IntId)
-            return new JValue(int.Parse(value));
-        if (dataTypeId == DataTypeIdsEnum.FloatId)
-            return new JValue(float.Parse(value));
-        if (dataTypeId == DataTypeIdsEnum.BooleanId)
-            return new JValue(bool.Parse(value));
-        return new JValue(value);
-    }
 }

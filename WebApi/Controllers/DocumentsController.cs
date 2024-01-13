@@ -1,8 +1,9 @@
-﻿using Core.Enums;
+﻿using Application.Utils;
+using Core.Enums;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace WebApi.Controllers;
 
@@ -19,7 +20,7 @@ public class DocumentsController : ControllerBase
 
     [Authorize(Roles = AccessLevels.GeneralAccess)]
     [HttpPost("{workspaceId:guid}/{objectName}")]
-    public async Task<IActionResult> PostObject(string objectName, Guid workspaceId)
+    public async Task<IActionResult> PostDocument(string objectName, Guid workspaceId)
     {
         using var bufferStream = new MemoryStream();
         await HttpContext.Request.Body.CopyToAsync(bufferStream);
@@ -30,26 +31,25 @@ public class DocumentsController : ControllerBase
         {
             return BadRequest(result.Errors);
         }
-        var json = _documentService.SerializeDocument(result.Value);
+        var json = StoredDocumentSerializer.SerializeDocument(result.Value);
         return Ok(json.Value);
     }
     
     [Authorize(Roles = AccessLevels.GeneralAccess)]
     [HttpGet("{workspaceId:guid}/{objectName}")]
-    public async Task<IActionResult> GetObject([FromRoute]string objectName, [FromRoute]Guid workspaceId, [FromQuery]string? pkValue)
+    public async Task<IActionResult> GetDocument([FromRoute]string objectName, [FromRoute]Guid workspaceId, [FromQuery]string? pkValue)
     {
-        if (pkValue is not null)
+        if (pkValue is null)
         {
-            var documentResult = await _documentService.RetrieveDocument(workspaceId, objectName, pkValue);
-            if (!documentResult.IsSuccess)
-            {
-                return NotFound();
-            }
-            var json = _documentService.SerializeDocument(documentResult.Value);
-            return Ok(json.Value);
-
+            return BadRequest();
         }
-
-        return BadRequest();
+        
+        var documentResult = await _documentService.RetrieveDocument(workspaceId, objectName, pkValue);
+        if (!documentResult.IsSuccess)
+        {
+            return NotFound();
+        }
+        var json = StoredDocumentSerializer.SerializeDocument(documentResult.Value);
+        return Ok(json.Value.ToString(formatting: Formatting.Indented));
     }
 }
