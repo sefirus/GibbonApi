@@ -17,11 +17,11 @@ public class SchemaFieldMappingFixture
 
     public List<SchemaField> PrimitiveTypesExpected { get; } = new()
     {
-        new SchemaField { FieldName = "IntField", DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = 1, Max = 10 },
-        new SchemaField { FieldName = "FloatField", DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id, Min = 1.0f, Max = 5.5f },
-        new SchemaField { FieldName = "StringField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 50, Pattern = "^[a-z]*$" },
-        new SchemaField { FieldName = "ObjectIdField", DataTypeId = DataTypesEnum.GetDataTypeObject("ObjectId").Id },
-        new SchemaField { FieldName = "UuidField", DataTypeId = DataTypesEnum.GetDataTypeObject("Uuid").Id },
+        new SchemaField { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), FieldName = "IntField", DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = 1, Max = 10 },
+        new SchemaField { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), FieldName = "FloatField", DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id, Min = 1.0f, Max = 5.5f },
+        new SchemaField { Id = Guid.Parse("00000000-0000-0000-0000-000000000003"), FieldName = "StringField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 50, Pattern = "^[a-z]*$" },
+        new SchemaField { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"), FieldName = "ObjectIdField", DataTypeId = DataTypesEnum.GetDataTypeObject("ObjectId").Id },
+        new SchemaField { Id = Guid.Parse("00000000-0000-0000-0000-000000000005"), FieldName = "UuidField", DataTypeId = DataTypesEnum.GetDataTypeObject("Uuid").Id },
     };
 
     public Dictionary<string, SchemaFieldViewModel> MixedTypesWithNestedTypesSource => new()
@@ -37,13 +37,14 @@ public class SchemaFieldMappingFixture
 
     public List<SchemaField> MixedTypesWithNestedTypesExpected => new()
     {
-        new () { FieldName = "IntField", DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = -50, Max = 50 },
-        new () { FieldName = "FloatField", DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id, Min = -50.0f, Max = 50.0f },
-        new () { FieldName = "StringField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 20 },
-        new () { FieldName = "ObjectIdField", DataTypeId = DataTypesEnum.GetDataTypeObject("ObjectId").Id },
-        new () { FieldName = "UuidField", DataTypeId = DataTypesEnum.GetDataTypeObject("Uuid").Id },
+        new () { Id = Guid.Parse("00000000-0000-0000-0000-000000000006"), FieldName = "IntField", DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = -50, Max = 50 },
+        new () { Id = Guid.Parse("00000000-0000-0000-0000-000000000007"), FieldName = "FloatField", DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id, Min = -50.0f, Max = 50.0f },
+        new () { Id = Guid.Parse("00000000-0000-0000-0000-000000000008"), FieldName = "StringField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 20 },
+        new () { Id = Guid.Parse("00000000-0000-0000-0000-000000000009"), FieldName = "ObjectIdField", DataTypeId = DataTypesEnum.GetDataTypeObject("ObjectId").Id },
+        new () { Id = Guid.Parse("00000000-0000-0000-0000-000000000010"), FieldName = "UuidField", DataTypeId = DataTypesEnum.GetDataTypeObject("Uuid").Id },
         new ()
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000011"),
             FieldName = "StringArrayField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -52,7 +53,9 @@ public class SchemaFieldMappingFixture
                 new (){ FieldName = "StringArrayField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 15 }
             },
         },
-        new () { 
+        new () 
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000012"),
             FieldName = "IntArrayField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -74,7 +77,9 @@ public class SchemaFieldMappingFixture
 
     public List<SchemaField> ArrayOfPrimitivesExpected => new()
     {
-        new () { 
+        new () 
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000013"),
             FieldName = "IntArrayField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -83,7 +88,9 @@ public class SchemaFieldMappingFixture
                 new SchemaField(){ FieldName = "IntArrayField", DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = -10, Max = 10}
             } 
         },
-        new () { 
+        new () 
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000014"),
             FieldName = "FloatArrayField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -94,6 +101,7 @@ public class SchemaFieldMappingFixture
         },
         new ()
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000015"),
             FieldName = "StringArrayField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -104,6 +112,7 @@ public class SchemaFieldMappingFixture
         },
         new ()
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000016"),
             FieldName = "ObjectIdArrayField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -112,7 +121,9 @@ public class SchemaFieldMappingFixture
                 new (){ FieldName = "ObjectIdArrayField", DataTypeId = DataTypesEnum.GetDataTypeObject("ObjectId").Id }
             },
         },
-        new () { 
+        new () 
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000017"),
             FieldName = "UuidArrayField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -152,6 +163,7 @@ public class SchemaFieldMappingFixture
     {
         new SchemaField()
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000018"),
             FieldName = "IntField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -162,6 +174,7 @@ public class SchemaFieldMappingFixture
         },
         new SchemaField()
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000019"),
             FieldName = "FloatField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -172,6 +185,7 @@ public class SchemaFieldMappingFixture
         },
         new SchemaField()
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000020"),
             FieldName = "StringField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, ChildFields = new()
@@ -181,6 +195,7 @@ public class SchemaFieldMappingFixture
         },
         new SchemaField()
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000021"),
             FieldName = "ObjectIdField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -189,7 +204,9 @@ public class SchemaFieldMappingFixture
                 new SchemaField(){ FieldName = "ObjectIdField", DataTypeId = DataTypesEnum.GetDataTypeObject("ObjectId").Id }
             }
         },
-        new SchemaField() { 
+        new SchemaField() 
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000022"),
             FieldName = "ObjectField", 
             DataTypeId = DataTypeIdsEnum.ArrayId, 
             IsArray = true, 
@@ -197,16 +214,17 @@ public class SchemaFieldMappingFixture
             { 
                 new SchemaField()
                 {
+                    Id = Guid.Parse("00000000-0000-0000-0000-000000000023"),
                     FieldName = "ObjectField",
                     DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
                     IsArray = false,
                     ChildFields = new()
                     {
-                        new SchemaField() { FieldName = "NestedIntField", DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = -100, Max = 500 },
-                        new SchemaField() { FieldName = "NestedFloatField", DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id, Min = 0, Max = 1 },
-                        new SchemaField() { FieldName = "NestedStringField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 15 },
-                        new SchemaField() { FieldName = "NestedObjectIdField", DataTypeId = DataTypesEnum.GetDataTypeObject("ObjectId").Id },
-                        new SchemaField() { FieldName = "NestedUuidField", DataTypeId = DataTypesEnum.GetDataTypeObject("Uuid").Id },
+                        new SchemaField() { Id = Guid.Parse("00000000-0000-0000-0000-000000000024"), FieldName = "NestedIntField", DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id, Min = -100, Max = 500 },
+                        new SchemaField() { Id = Guid.Parse("00000000-0000-0000-0000-000000000025"), FieldName = "NestedFloatField", DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id, Min = 0, Max = 1 },
+                        new SchemaField() { Id = Guid.Parse("00000000-0000-0000-0000-000000000026"), FieldName = "NestedStringField", DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id, Length = 15 },
+                        new SchemaField() { Id = Guid.Parse("00000000-0000-0000-0000-000000000027"), FieldName = "NestedObjectIdField", DataTypeId = DataTypesEnum.GetDataTypeObject("ObjectId").Id },
+                        new SchemaField() { Id = Guid.Parse("00000000-0000-0000-0000-000000000028"), FieldName = "NestedUuidField", DataTypeId = DataTypesEnum.GetDataTypeObject("Uuid").Id },
                     }
                 } 
             } 
@@ -248,6 +266,7 @@ public class SchemaFieldMappingFixture
     {
         new SchemaField()
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000029"),
             FieldName = "IntObjectField",
             DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
             ChildFields = new()
@@ -263,6 +282,7 @@ public class SchemaFieldMappingFixture
         },
         new SchemaField()
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000030"),
             FieldName = "FloatObjectField",
             DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
             ChildFields = new()
@@ -278,6 +298,7 @@ public class SchemaFieldMappingFixture
         },
         new SchemaField()
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000031"),
             FieldName = "StringObjectField",
             DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
             ChildFields = new()
@@ -375,6 +396,7 @@ public class SchemaFieldMappingFixture
     {
         new SchemaField
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000032"),
             FieldName = "ArrayOfObjectsField",
             DataTypeId = DataTypeIdsEnum.ArrayId,
             IsArray = true,
@@ -382,6 +404,7 @@ public class SchemaFieldMappingFixture
             {
                 new SchemaField
                 {
+                    Id = Guid.Parse("00000000-0000-0000-0000-000000000033"),
                     FieldName = "ArrayOfObjectsField",
                     DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
                     IsArray = false,
@@ -389,6 +412,7 @@ public class SchemaFieldMappingFixture
                     {
                         new SchemaField
                         {
+                            Id = Guid.Parse("00000000-0000-0000-0000-000000000034"),
                             FieldName = "IntField",
                             DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id,
                             Min = -50,
@@ -396,6 +420,7 @@ public class SchemaFieldMappingFixture
                         },
                         new SchemaField
                         {
+                            Id = Guid.Parse("00000000-0000-0000-0000-000000000035"),
                             FieldName = "FloatField",
                             DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id,
                             Min = -50,
@@ -403,18 +428,21 @@ public class SchemaFieldMappingFixture
                         },
                         new SchemaField
                         {
+                            Id = Guid.Parse("00000000-0000-0000-0000-000000000036"),
                             FieldName = "StringField",
                             DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
                             Length = 30,
                         },
                         new SchemaField
                         {
+                            Id = Guid.Parse("00000000-0000-0000-0000-000000000037"),
                             FieldName = "NestedObjectField",
                             DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
                             ChildFields = new List<SchemaField>
                             {
                                 new SchemaField
                                 {
+                                    Id = Guid.Parse("00000000-0000-0000-0000-000000000038"),
                                     FieldName = "NestedIntField",
                                     DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id,
                                     Min = -100,
@@ -422,6 +450,7 @@ public class SchemaFieldMappingFixture
                                 },
                                 new SchemaField
                                 {
+                                    Id = Guid.Parse("00000000-0000-0000-0000-000000000039"),
                                     FieldName = "NestedFloatField",
                                     DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id,
                                     Min = -100,
@@ -429,6 +458,7 @@ public class SchemaFieldMappingFixture
                                 },
                                 new SchemaField
                                 {
+                                    Id = Guid.Parse("00000000-0000-0000-0000-000000000040"),
                                     FieldName = "NestedStringField",
                                     DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
                                     Length = 50,
@@ -506,6 +536,7 @@ public class SchemaFieldMappingFixture
     {
         new SchemaField
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000041"),
             FieldName = "ArrayOfArraysOfObjects",
             DataTypeId = DataTypeIdsEnum.ArrayId,
             IsArray = true,
@@ -513,6 +544,7 @@ public class SchemaFieldMappingFixture
             {
                 new SchemaField
                 {
+                    Id = Guid.Parse("00000000-0000-0000-0000-000000000042"),
                     FieldName = "ArrayOfArraysOfObjects",
                     DataTypeId = DataTypeIdsEnum.ArrayId,
                     IsArray = true,
@@ -520,6 +552,7 @@ public class SchemaFieldMappingFixture
                     {
                         new SchemaField
                         {
+                            Id = Guid.Parse("00000000-0000-0000-0000-000000000043"),
                             FieldName = "IntField",
                             DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id,
                             Min = -50,
@@ -527,6 +560,7 @@ public class SchemaFieldMappingFixture
                         },
                         new SchemaField
                         {
+                            Id = Guid.Parse("00000000-0000-0000-0000-000000000044"),
                             FieldName = "FloatField",
                             DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id,
                             Min = -50,
@@ -534,6 +568,7 @@ public class SchemaFieldMappingFixture
                         },
                         new SchemaField
                         {
+                            Id = Guid.Parse("00000000-0000-0000-0000-000000000045"),
                             FieldName = "StringField",
                             DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
                             Length = 30
@@ -544,6 +579,7 @@ public class SchemaFieldMappingFixture
         },
         new SchemaField
         {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000046"),
             FieldName = "ArrayOfArraysOfArraysOfInts",
             DataTypeId = DataTypeIdsEnum.ArrayId,
             IsArray = true,
@@ -551,6 +587,7 @@ public class SchemaFieldMappingFixture
             {
                 new SchemaField
                 {
+                    Id = Guid.Parse("00000000-0000-0000-0000-000000000047"),
                     FieldName = "ArrayOfArraysOfArraysOfInts",
                     DataTypeId = DataTypeIdsEnum.ArrayId,
                     IsArray = true,
@@ -558,6 +595,7 @@ public class SchemaFieldMappingFixture
                     {
                         new SchemaField
                         {
+                            Id = Guid.Parse("00000000-0000-0000-0000-000000000048"),
                             FieldName = "ArrayOfArraysOfArraysOfInts",
                             DataTypeId = DataTypeIdsEnum.ArrayId,
                             IsArray = true,
@@ -565,6 +603,7 @@ public class SchemaFieldMappingFixture
                             {
                                 new SchemaField
                                 {
+                                    Id = Guid.Parse("00000000-0000-0000-0000-000000000049"),
                                     FieldName = "ArrayOfArraysOfArraysOfInts",
                                     DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id,
                                     Min = 0,
