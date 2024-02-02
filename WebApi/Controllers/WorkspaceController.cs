@@ -20,12 +20,12 @@ public class WorkspaceController : ControllerBase
     [Authorize]
     public async Task<ReadWorkspaceShortViewModel> CreateWorkspace(CreateWorkspaceViewModel model)
     {
-        var workspace = await _workspaceService.CreateWorkspaceAsync(model.Name, false); // isAiEnabled is set to false
+        var workspace = await _workspaceService.CreateWorkspaceAsync(model.Name, isAiEnabled: false);
 
         var readWorkspaceModel = new ReadWorkspaceShortViewModel
         {
-            Id = workspace.Id,
-            Name = workspace.Name
+            Id = workspace.Value.Id,
+            Name = workspace.Value.Name
         };
 
         return readWorkspaceModel;

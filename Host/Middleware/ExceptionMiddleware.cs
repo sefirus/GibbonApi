@@ -21,15 +21,6 @@ public class ExceptionMiddleware
         {
             await _next(httpContext);
         }
-        catch (NotFoundException ex)
-        {
-            httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
-            httpContext.Response.ContentType = "application/json";
-            await httpContext.Response.WriteAsync(JsonSerializer.Serialize(new
-            {
-                ex.Message
-            }));
-        }
         catch (InvalidOperationException ex) when (ex.Message.Contains("Sequence contains no elements"))
         {
             httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
