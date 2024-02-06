@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Application.Utils;
 
+//TODO: Fix nested arrays
 public static class StoredDocumentSerializer
 {
     private static void CutOffNonChildFieldsFromStoredDocument(StoredDocument document)
@@ -46,16 +47,22 @@ public static class StoredDocumentSerializer
     {
         var array = GetOrCreateArray(parentObject, schemaField.FieldName);
 
-        var isObjectArray = schemaField.ChildFields!.Single().DataTypeId == DataTypeIdsEnum.ObjectId 
-                            || schemaField.ChildFields!.Single().DataTypeId == DataTypeIdsEnum.ArrayId;
+        var childDataTypeId = schemaField.ChildFields!.Single().DataTypeId;
+        var isArrayOfObjects = childDataTypeId == DataTypeIdsEnum.ObjectId; 
+        var isArrayOfArrays = childDataTypeId == DataTypeIdsEnum.ArrayId;
 
         foreach (var childFieldValue in fieldValue.ChildFields ?? Enumerable.Empty<FieldValue>())
         {
-            if (isObjectArray)
+            if (isArrayOfObjects)
             {
                 var childObject = new JObject();
                 array.Add(childObject);
                 ProcessChildFields(childObject, childFieldValue);
+            }
+            else if (isArrayOfArrays)
+            {
+                var childArray = GetOrCreateArray(parentObject, schemaField.FieldName);
+                array.Add(childArray);
             }
             else
             {
