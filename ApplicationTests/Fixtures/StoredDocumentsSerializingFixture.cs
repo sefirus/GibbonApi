@@ -334,27 +334,35 @@ public class StoredDocumentsSerializingFixture
                 {
                     new FieldValue
                     {
-                        SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().Id,
-                        SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First(),
+                        SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].Id,
+                        SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0],
                         ChildFields = new List<FieldValue>
                         {
                             new FieldValue
                             {
-                                SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[0].Id,
-                                Value = "25",
-                                SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[0]
-                            },
-                            new FieldValue
-                            {
-                                SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[1].Id,
-                                Value = "25.5",
-                                SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[1]
-                            },
-                            new FieldValue
-                            {
-                                SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[2].Id,
-                                Value = "exampleString",
-                                SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[2]
+                                SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].Id,
+                                SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0],
+                                ChildFields = new List<FieldValue>()
+                                {
+                                    new FieldValue
+                                    {
+                                        SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[0].Id,
+                                        Value = "25",
+                                        SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[0]
+                                    },
+                                    new FieldValue
+                                    {
+                                        SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[1].Id,
+                                        Value = "25.5",
+                                        SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[1]
+                                    },
+                                    new FieldValue
+                                    {
+                                        SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[2].Id,
+                                        Value = "exampleString",
+                                        SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[2]
+                                    }
+                                }
                             }
                         }
                     }
@@ -414,27 +422,35 @@ public class StoredDocumentsSerializingFixture
                 {
                     new FieldValue
                     {
-                        SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().Id,
-                        SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First(),
+                        SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].Id,
+                        SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0],
                         ChildFields = new List<FieldValue>
                         {
                             new FieldValue
                             {
-                                SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[0].Id,
-                                Value = "-15",
-                                SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[0]
-                            },
-                            new FieldValue
-                            {
-                                SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[1].Id,
-                                Value = "-15.5",
-                                SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[1]
-                            },
-                            new FieldValue
-                            {
-                                SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[2].Id,
-                                Value = "anotherExampleString",
-                                SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields.First().ChildFields[2]
+                                SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].Id,
+                                SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0],
+                                ChildFields = new List<FieldValue>()
+                                {
+                                    new FieldValue
+                                    {
+                                        SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[0].Id,
+                                        Value = "-15",
+                                        SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[0]
+                                    },
+                                    new FieldValue
+                                    {
+                                        SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[1].Id,
+                                        Value = "-15.5",
+                                        SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[1]
+                                    },
+                                    new FieldValue
+                                    {
+                                        SchemaFieldId = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[2].Id,
+                                        Value = "anotherExampleString",
+                                        SchemaField = SchemaFixture.ComplexNestedArraysExpected[0].ChildFields[0].ChildFields[0].ChildFields[2]
+                                    }
+                                }
                             }
                         }
                     }

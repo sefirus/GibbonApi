@@ -552,26 +552,36 @@ public class SchemaFieldMappingFixture
                     {
                         new SchemaField
                         {
-                            Id = Guid.Parse("00000000-0000-0000-0000-000000000043"),
-                            FieldName = "IntField",
-                            DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id,
-                            Min = -50,
-                            Max = 50
-                        },
-                        new SchemaField
-                        {
-                            Id = Guid.Parse("00000000-0000-0000-0000-000000000044"),
-                            FieldName = "FloatField",
-                            DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id,
-                            Min = -50,
-                            Max = 50
-                        },
-                        new SchemaField
-                        {
-                            Id = Guid.Parse("00000000-0000-0000-0000-000000000045"),
-                            FieldName = "StringField",
-                            DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
-                            Length = 30
+                            Id = Guid.Parse("00000000-0000-0000-0000-000000000050"),
+                            FieldName = "ArrayOfObjectsField",
+                            DataTypeId = DataTypesEnum.GetDataTypeObject("Object").Id,
+                            IsArray = false,
+                            ChildFields = new List<SchemaField> 
+                            {
+                                new SchemaField
+                                {
+                                    Id = Guid.Parse("00000000-0000-0000-0000-000000000043"),
+                                    FieldName = "IntField",
+                                    DataTypeId = DataTypesEnum.GetDataTypeObject("Int").Id,
+                                    Min = -50,
+                                    Max = 50
+                                },
+                                new SchemaField
+                                {
+                                    Id = Guid.Parse("00000000-0000-0000-0000-000000000044"),
+                                    FieldName = "FloatField",
+                                    DataTypeId = DataTypesEnum.GetDataTypeObject("Float").Id,
+                                    Min = -50,
+                                    Max = 50
+                                },
+                                new SchemaField
+                                {
+                                    Id = Guid.Parse("00000000-0000-0000-0000-000000000045"),
+                                    FieldName = "StringField",
+                                    DataTypeId = DataTypesEnum.GetDataTypeObject("String").Id,
+                                    Length = 30
+                                }
+                            }
                         }
                     }
                 }

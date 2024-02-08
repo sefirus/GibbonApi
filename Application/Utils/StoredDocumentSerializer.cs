@@ -35,7 +35,7 @@ public static class StoredDocumentSerializer
 
         if (schemaField.IsArray)
         {
-            ProcessArrayField(parentObject, fieldValue, schemaField);
+            parentObject[schemaField.FieldName] = ProcessArrayField(fieldValue, schemaField);
         }
         else
         {
@@ -43,9 +43,9 @@ public static class StoredDocumentSerializer
         }
     }
 
-    private static void ProcessArrayField(JObject parentObject, FieldValue fieldValue, SchemaField schemaField)
+    private static JArray ProcessArrayField(FieldValue fieldValue, SchemaField schemaField)
     {
-        var array = GetOrCreateArray(parentObject, schemaField.FieldName);
+        var array = new JArray();
 
         var childDataTypeId = schemaField.ChildFields!.Single().DataTypeId;
         var isArrayOfObjects = childDataTypeId == DataTypeIdsEnum.ObjectId; 
@@ -61,14 +61,18 @@ public static class StoredDocumentSerializer
             }
             else if (isArrayOfArrays)
             {
-                var childArray = GetOrCreateArray(parentObject, schemaField.FieldName);
-                array.Add(childArray);
+                foreach (var childArrayValue in fieldValue.ChildFields ?? Enumerable.Empty<FieldValue>())
+                {
+                    var childArray = ProcessArrayField(childArrayValue,  childArrayValue.SchemaField); 
+                    array.Add(childArray);  
+                }
             }
             else
             {
                 array.Add(ConvertValue(childFieldValue.Value, childFieldValue.SchemaField.DataTypeId));
             }
         }
+        return array;
     }
 
     private static void ProcessSingleField(JObject parentObject, FieldValue fieldValue, SchemaField schemaField)
@@ -90,16 +94,17 @@ public static class StoredDocumentSerializer
         }
     }
 
-    private static JArray GetOrCreateArray(JObject parentObject, string fieldName)
+    private static JArray GetOrCreateArray(JToken parentField, string fieldName)
     {
-        if (parentObject.TryGetValue(fieldName, out var currentToken) 
+        if (parentField is JObject parentObject
+            && parentObject.TryGetValue(fieldName, out var currentToken) 
             && currentToken.Type == JTokenType.Array)
         {
             return (JArray)currentToken;
         }        
         
         var array = new JArray();
-        parentObject[fieldName] = array;
+        //parentObject[fieldName]=  array;
         return array;
     }
 
