@@ -22,9 +22,13 @@ public class WorkspaceService : IWorkspaceService
         _currentUserService = currentUserService;
     }
     
-    public async Task<Workspace> CreateWorkspaceAsync(string name, bool isAiEnabled)
+    public async Task<Result<Workspace>> CreateWorkspaceAsync(string name, bool isAiEnabled)
     {
         var userId = _currentUserService.GetCurrentUserId();
+        if (userId.IsFailed)
+        {
+            return Result.Fail("Wrong authentication scheme.");
+        }
         
         var ownerRole = await _context.WorkspaceRoles.FirstAsync(r => r.Name == RolesEnum.Owner);
 
@@ -46,7 +50,7 @@ public class WorkspaceService : IWorkspaceService
             Id = Guid.NewGuid(),
             RoleId = ownerRole.Id,
             WorkspaceRole = ownerRole,
-            UserId = userId,
+            UserId = userId.Value,
             WorkspaceId = workspace.Id,
             Workspace = workspace,
             CreatedDate = DateTime.UtcNow,

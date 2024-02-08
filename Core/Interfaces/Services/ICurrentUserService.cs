@@ -1,6 +1,8 @@
-﻿namespace Core.Interfaces.Services;
+﻿using FluentResults;
+
+namespace Core.Interfaces.Services;
 
 public interface ICurrentUserService
 {
-    Guid GetCurrentUserId();
+    Result<Guid> GetCurrentUserId();
 }
