@@ -22,14 +22,14 @@ public class StoredDocumentJsonParser
     public StoredDocumentJsonParser(SchemaObject schemaObject)
     {
         _schemaObject = schemaObject; 
-        var primaryField = _schemaObject.Fields.Single(sf => sf.IsPrimaryKey);
+        var primaryField = _schemaObject.Fields.SingleOrDefault(sf => sf.IsPrimaryKey);
         StoredDocument = new StoredDocument
         {
             SchemaObject = _schemaObject,
             SchemaObjectId = _schemaObject.Id,
             FieldValues = new List<FieldValue>(),
             Id = Guid.NewGuid(),
-            PrimaryKeySchemaFieldId = primaryField.Id
+            PrimaryKeySchemaFieldId = primaryField?.Id ?? default
         };
     }
 
