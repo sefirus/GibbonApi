@@ -33,9 +33,22 @@ public class WorkspaceController : ControllerBase
     
     [Authorize(Roles = AccessLevels.AdminAccess)]
     [HttpPatch("{workspaceId:guid}/rename")]
-    public async Task RenameWorkspace(Guid workspaceId, RenameWorkspaceViewModel model)
+    public async Task RenameWorkspaceById(Guid workspaceId, [FromBody]RenameWorkspaceViewModel model)
     {
         await _workspaceService.RenameWorkspace(workspaceId, model.NewName);
+    }
+    
+    [Authorize(Roles = AccessLevels.AdminAccess)]
+    [HttpPatch("{workspaceName}/rename")]
+    public async Task<IActionResult> RenameWorkspaceByName(string workspaceName, [FromBody]RenameWorkspaceViewModel model)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+        await _workspaceService.RenameWorkspace(workspaceIdResult.Value, model.NewName);
+        return Ok();
     }
 
     [Authorize(Roles = AccessLevels.OwnerAccess)]

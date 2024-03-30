@@ -26,6 +26,8 @@ public static class RolesEnum
     /// To remove the role from the user
     /// </summary>
     public const string None = "None";
+    
+    public const string WorkspaceId = "WorkspaceIdClaim";
 
     public static List<string> WorkspaceRoles = new (){ Owner, Admin, General };
 }
