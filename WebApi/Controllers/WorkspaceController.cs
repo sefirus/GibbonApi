@@ -57,4 +57,18 @@ public class WorkspaceController : ControllerBase
     {
         await _workspaceService.AssignPermission(workspaceId, permissionViewModel);
     }
+    
+    [Authorize(Roles = AccessLevels.OwnerAccess)]
+    [HttpPut("{workspaceName}/assign-permission")]
+    public async Task<IActionResult> AssignWorkspacePermission(string workspaceName, [FromBody] AssignPermissionViewModel permissionViewModel)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+
+        await _workspaceService.AssignPermission(workspaceIdResult.Value, permissionViewModel);
+        return Ok();
+    }
 }
