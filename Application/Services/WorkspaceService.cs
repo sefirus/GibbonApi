@@ -21,13 +21,42 @@ public class WorkspaceService : IWorkspaceService
         _context = context;
         _currentUserService = currentUserService;
     }
-    
+
+    public async Task<Result<Guid>> GetWorkspaceIdFromName(string? name)
+    {
+        Guid id;
+        try
+        {
+            id = await _context.Workspaces
+                .Where(ws => ws.Name == name)
+                .Select(ws => ws.Id)
+                .SingleOrDefaultAsync();
+        }
+        catch (InvalidOperationException)
+        {
+            return Result.Fail("There are more than one Workspace with the provided name.");
+        }
+
+        if (id == default)
+        {
+            return Result.Fail("Workspace with provided name either does not exist or you don't have permissions to access it.");
+        }
+
+        return id;
+    }
+
     public async Task<Result<Workspace>> CreateWorkspaceAsync(string name, bool isAiEnabled)
     {
         var userId = _currentUserService.GetCurrentUserId();
         if (userId.IsFailed)
         {
             return Result.Fail("Wrong authentication scheme.");
+        }
+
+        var isNameTaken = await _context.Workspaces.AnyAsync(ws => ws.Name == name);
+        if (isNameTaken)
+        {
+            return Result.Fail("Workspace name is already taken.");
         }
         
         var ownerRole = await _context.WorkspaceRoles.FirstAsync(r => r.Name == RolesEnum.Owner);
@@ -70,7 +99,7 @@ public class WorkspaceService : IWorkspaceService
             .UpdateFromQueryAsync(w => new Workspace { Name = newName, ModifiedDate = DateTime.UtcNow });
         if (modifiedCount < 1)
         {
-            return Result.Fail(nameof(Workspace));
+            return Result.Fail("Workspace with provided name either does not exist or you don't have permissions to access it.");
         }
 
         return Result.Ok();

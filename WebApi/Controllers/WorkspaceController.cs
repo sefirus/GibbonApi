@@ -33,9 +33,22 @@ public class WorkspaceController : ControllerBase
     
     [Authorize(Roles = AccessLevels.AdminAccess)]
     [HttpPatch("{workspaceId:guid}/rename")]
-    public async Task RenameWorkspace(Guid workspaceId, RenameWorkspaceViewModel model)
+    public async Task RenameWorkspaceById(Guid workspaceId, [FromBody]RenameWorkspaceViewModel model)
     {
         await _workspaceService.RenameWorkspace(workspaceId, model.NewName);
+    }
+    
+    [Authorize(Roles = AccessLevels.AdminAccess)]
+    [HttpPatch("{workspaceName}/rename")]
+    public async Task<IActionResult> RenameWorkspaceByName(string workspaceName, [FromBody]RenameWorkspaceViewModel model)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+        await _workspaceService.RenameWorkspace(workspaceIdResult.Value, model.NewName);
+        return Ok();
     }
 
     [Authorize(Roles = AccessLevels.OwnerAccess)]
@@ -43,5 +56,19 @@ public class WorkspaceController : ControllerBase
     public async Task AssignWorkspacePermission(Guid workspaceId, AssignPermissionViewModel permissionViewModel)
     {
         await _workspaceService.AssignPermission(workspaceId, permissionViewModel);
+    }
+    
+    [Authorize(Roles = AccessLevels.OwnerAccess)]
+    [HttpPut("{workspaceName}/assign-permission")]
+    public async Task<IActionResult> AssignWorkspacePermission(string workspaceName, [FromBody] AssignPermissionViewModel permissionViewModel)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+
+        await _workspaceService.AssignPermission(workspaceIdResult.Value, permissionViewModel);
+        return Ok();
     }
 }

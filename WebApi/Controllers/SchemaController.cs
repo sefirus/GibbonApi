@@ -31,7 +31,22 @@ public class SchemaController : ControllerBase
         var viewModel = _schemaObjectViewModelMapper.Map(obj);
         return viewModel;
     }
+    
+    [Authorize(Roles = AccessLevels.GeneralAccess)]
+    [HttpGet("{workspaceName}")]
+    public async Task<ActionResult<SchemaObjectViewModel>> GetSchemaObject([FromRoute]string workspaceName, [FromQuery]string schemaObjectName)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
 
+        var obj = await _schemaService.RetrieveSchemaObject(workspaceIdResult.Value, schemaObjectName);
+        var viewModel = _schemaObjectViewModelMapper.Map(obj);
+        return viewModel;
+    }
+    
     [Authorize(Roles = AccessLevels.AdminAccess)]
     [HttpPost("{workspaceId:guid}/{objectName}")]
     public async Task<IActionResult> CreateSchemaObject(
@@ -42,4 +57,22 @@ public class SchemaController : ControllerBase
         await _schemaService.CreateWorkspaceObject(workspaceId, objectName, objectViewModel);
         return Ok();
     }
+    
+    [Authorize(Roles = AccessLevels.AdminAccess)]
+    [HttpPost("{workspaceName}/{objectName}")]
+    public async Task<IActionResult> CreateSchemaObject(
+        [FromRoute]string workspaceName, 
+        [FromRoute]string objectName,
+        [FromBody]Dictionary<string, SchemaFieldViewModel> objectViewModel)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+
+        await _schemaService.CreateWorkspaceObject(workspaceIdResult.Value, objectName, objectViewModel);
+        return Ok();
+    }
+
 }

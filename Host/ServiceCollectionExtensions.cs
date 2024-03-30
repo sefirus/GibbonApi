@@ -3,6 +3,7 @@ using Application.Mappers;
 using Application.Services;
 using Application.Validators;
 using Core.Entities;
+using Core.Enums;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.ViewModels.Schema;
@@ -88,6 +89,35 @@ public static class ServiceCollectionExtensions
         });
     }
 
+    private static async Task<Guid> GetWorkspaceId(IServiceProvider services, RouteValueDictionary routeValues)
+    {
+        var workspaceIdFromRoute = routeValues["workspaceId"];
+
+        if (workspaceIdFromRoute != null
+            && Guid.TryParse(workspaceIdFromRoute.ToString(), out var workspaceId))
+        {
+            return workspaceId;
+        }
+        
+        var workspaceNameFromRoute = routeValues["workspaceName"];
+        if (workspaceNameFromRoute == null)
+        {
+            return default;
+        }
+        
+        var workspaceService = services.GetRequiredService<IWorkspaceService>();
+        var id = await workspaceService.GetWorkspaceIdFromName(workspaceNameFromRoute.ToString());
+        if (id.IsFailed)
+        {
+            return default;
+
+        }
+
+        workspaceId = id.Value;
+
+        return workspaceId;
+    }
+
     public static void ConfigureWorkspacePermissionsAuth(this IServiceCollection services)
     {
         services
@@ -104,13 +134,7 @@ public static class ServiceCollectionExtensions
                         var dbContext = context.HttpContext.RequestServices.GetRequiredService<GibbonDbContext>();
         
                         var routeData = context.HttpContext.GetRouteData();
-                        var workspaceIdRouteDate = routeData?.Values["workspaceId"];
-        
-                        if (workspaceIdRouteDate == null 
-                            || !Guid.TryParse(workspaceIdRouteDate.ToString(), out var workspaceId))
-                        {
-                            return;
-                        }
+
                         var userIdClaim = context.Principal.FindFirst(ClaimTypes.NameIdentifier);
                         if (userIdClaim == null)
                         {
@@ -121,6 +145,8 @@ public static class ServiceCollectionExtensions
                         {
                            return; 
                         }
+
+                        var workspaceId = await GetWorkspaceId(context.HttpContext.RequestServices, routeData.Values);
                         
                         var userPermissionOnWorkspace = await dbContext.WorkspacePermissions
                             .Where(wp => wp.UserId == userId
@@ -129,13 +155,14 @@ public static class ServiceCollectionExtensions
                             .FirstOrDefaultAsync();
                         if (userPermissionOnWorkspace == null)
                         {
-                            context.Fail("Unauthorized");
+                            context.Fail("The requested Workspace either does not exist or you don't have permissions to access it.");
                             return;
                         }
         
                         var workspaceRoleClaim = new Claim(ClaimTypes.Role, userPermissionOnWorkspace);
+                        var workspaceIdClaim = new Claim(RolesEnum.WorkspaceId, workspaceId.ToString());
         
-                        ((ClaimsIdentity)context.Principal.Identity).AddClaims(new[] { workspaceRoleClaim });
+                        ((ClaimsIdentity)context.Principal.Identity).AddClaims(new[] { workspaceRoleClaim, workspaceIdClaim });
                     }
                 };
         
