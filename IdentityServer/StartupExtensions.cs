@@ -85,6 +85,18 @@ public static class StartupExtensions
                 RefreshTokenUsage = TokenUsage.OneTimeOnly,
                 ClientSecrets = {new Secret("tests_client_secret".ToSha256())},
                 AccessTokenLifetime = 6000,
+            },
+            new Client()
+            {
+                RequireConsent = false,
+                ClientId = "angular_client",
+                ClientName = "Angular Client",
+                AllowedScopes = {"apiAccess", "openid", "profile"},
+                AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                AllowOfflineAccess = true, // enable refresh tokens
+                RefreshTokenUsage = TokenUsage.OneTimeOnly,
+                ClientSecrets = {new Secret("tests_client_secret".ToSha256())},
+                AccessTokenLifetime = 6000,
             }
         };
 }

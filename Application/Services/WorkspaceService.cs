@@ -183,4 +183,20 @@ public class WorkspaceService : IWorkspaceService
         await _context.SaveChangesAsync();
         return Result.Ok();
     }
+
+    public Task<List<ReadWorkspaceViewModel>> GetUserWorkspaces(Guid userId)
+    {
+        return _context.WorkspacePermissions
+            .Where(wp => wp.UserId == userId)
+            .Select(wp => new { RoleName = wp.WorkspaceRole.Name, wp.Workspace})
+            .Select(w => new ReadWorkspaceViewModel
+            {
+                Id = w.Workspace.Id,
+                Name = w.Workspace.Name,
+                NumOfSchemaObjects = w.Workspace.SchemaObjects.Count,
+                NumOfDocuments = w.Workspace.SchemaObjects.SelectMany(so => so.StoredDocuments).Count(),
+                AccessLevel = w.RoleName
+            })
+            .ToListAsync();
+    }
 }

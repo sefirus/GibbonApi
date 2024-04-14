@@ -8,6 +8,7 @@ using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.ViewModels.Schema;
 using DataAccess;
+using FluentResults;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -89,7 +90,7 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    private static async Task<Guid> GetWorkspaceId(IServiceProvider services, RouteValueDictionary routeValues)
+    private static async Task<Result<Guid>> GetWorkspaceId(IServiceProvider services, RouteValueDictionary routeValues)
     {
         var workspaceIdFromRoute = routeValues["workspaceId"];
 
@@ -102,19 +103,18 @@ public static class ServiceCollectionExtensions
         var workspaceNameFromRoute = routeValues["workspaceName"];
         if (workspaceNameFromRoute == null)
         {
-            return default;
+            return Result.Fail<Guid>("No workspace data provided.");
         }
         
         var workspaceService = services.GetRequiredService<IWorkspaceService>();
         var id = await workspaceService.GetWorkspaceIdFromName(workspaceNameFromRoute.ToString());
         if (id.IsFailed)
         {
-            return default;
+            return (Guid)default;
 
         }
 
         workspaceId = id.Value;
-
         return workspaceId;
     }
 
@@ -127,6 +127,7 @@ public static class ServiceCollectionExtensions
                 options.Authority = "https://localhost:7030";
                 options.Audience = "GibbonApi";
                 options.TokenValidationParameters.ValidTypes = new[] { "at+jwt" };
+                options.IncludeErrorDetails = true;
                 options.Events = new JwtBearerEvents()
                 {
                     OnTokenValidated = async context =>
@@ -143,24 +144,30 @@ public static class ServiceCollectionExtensions
         
                         if(!Guid.TryParse(userIdClaim.Value, out var userId))
                         {
-                           return; 
+                            context.Fail("Can retrieve UserId from the token you provided.");
+                            return; 
                         }
 
+                        string? userPermissionOnWorkspace = null;
                         var workspaceId = await GetWorkspaceId(context.HttpContext.RequestServices, routeData.Values);
-                        
-                        var userPermissionOnWorkspace = await dbContext.WorkspacePermissions
-                            .Where(wp => wp.UserId == userId
-                                         && wp.WorkspaceId == workspaceId)
-                            .Select(wp => wp.WorkspaceRole.Name)
-                            .FirstOrDefaultAsync();
-                        if (userPermissionOnWorkspace == null)
+                        if (workspaceId.IsSuccess)
                         {
-                            context.Fail("The requested Workspace either does not exist or you don't have permissions to access it.");
-                            return;
+
+                            userPermissionOnWorkspace = await dbContext.WorkspacePermissions
+                                .Where(wp => wp.UserId == userId
+                                             && wp.WorkspaceId == workspaceId.Value)
+                                .Select(wp => wp.WorkspaceRole.Name)
+                                .FirstOrDefaultAsync();
+                            if (userPermissionOnWorkspace == null)
+                            {
+                                context.Fail(
+                                    "The requested Workspace either does not exist or you don't have permissions to access it.");
+                                return;
+                            }
                         }
-        
-                        var workspaceRoleClaim = new Claim(ClaimTypes.Role, userPermissionOnWorkspace);
-                        var workspaceIdClaim = new Claim(RolesEnum.WorkspaceId, workspaceId.ToString());
+
+                        var workspaceRoleClaim = new Claim(ClaimTypes.Role, userPermissionOnWorkspace ?? string.Empty);
+                        var workspaceIdClaim = new Claim(RolesEnum.WorkspaceId, workspaceId.Value.ToString());
         
                         ((ClaimsIdentity)context.Principal.Identity).AddClaims(new[] { workspaceRoleClaim, workspaceIdClaim });
                     }
