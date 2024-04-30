@@ -20,17 +20,25 @@ public class WorkspaceController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    public async Task<ReadWorkspaceShortViewModel> CreateWorkspace(CreateWorkspaceViewModel model)
+    public async Task<IActionResult> CreateWorkspace(CreateWorkspaceViewModel model)
     {
         var workspace = await _workspaceService.CreateWorkspaceAsync(model.Name, isAiEnabled: false);
 
+        if (workspace.IsFailed)
+        {
+            return BadRequest(new
+            {
+                Error = workspace.Errors.FirstOrDefault()?.Message
+            });
+        }
+        
         var readWorkspaceModel = new ReadWorkspaceShortViewModel
         {
             Id = workspace.Value.Id,
             Name = workspace.Value.Name
         };
 
-        return readWorkspaceModel;
+        return Ok(readWorkspaceModel);
     }
     
     [Authorize(Roles = AccessLevels.AdminAccess)]
@@ -55,9 +63,18 @@ public class WorkspaceController : ControllerBase
 
     [Authorize(Roles = AccessLevels.OwnerAccess)]
     [HttpPut("{workspaceId:guid}/assign-permission")]
-    public async Task AssignWorkspacePermission(Guid workspaceId, AssignPermissionViewModel permissionViewModel)
+    public async Task<IActionResult> AssignWorkspacePermission(Guid workspaceId, AssignPermissionViewModel permissionViewModel)
     {
-        await _workspaceService.AssignPermission(workspaceId, permissionViewModel);
+        var result = await _workspaceService.AssignPermission(workspaceId, permissionViewModel);
+        if (result.IsFailed)
+        {
+            return BadRequest(new
+            {
+                ErrorMessage = result.Errors.FirstOrDefault()?.Message
+            });
+        }
+
+        return Ok();
     }
     
     [Authorize(Roles = AccessLevels.OwnerAccess)]
@@ -70,7 +87,15 @@ public class WorkspaceController : ControllerBase
             return NotFound(workspaceIdResult.ToString());
         }
 
-        await _workspaceService.AssignPermission(workspaceIdResult.Value, permissionViewModel);
+        var result = await _workspaceService.AssignPermission(workspaceIdResult.Value, permissionViewModel);
+        if (result.IsFailed)
+        {
+            return BadRequest(new
+            {
+                ErrorMessage = result.Errors.FirstOrDefault()?.Message
+            });
+        }
+
         return Ok();
     }
 
@@ -109,5 +134,27 @@ public class WorkspaceController : ControllerBase
 
         var viewModel = await _workspaceService.GetWorkspace(workspaceIdResult.Value);
         return Ok(viewModel.Value);
+    }
+    
+    [Authorize(Roles = AccessLevels.AdminAccess)]
+    [HttpGet("{workspaceId:guid}/permissions")]
+    public async Task<List<WorkspacePermissionViewModel>> GetWorkspacePermissions(Guid workspaceId)
+    {
+        var result = await _workspaceService.GetPermissions(workspaceId);
+        return result;
+    }
+    
+    [Authorize(Roles = AccessLevels.AdminAccess)]
+    [HttpGet("{workspaceName}/permissions")]
+    public async Task<IActionResult> GetWorkspacePermissions(string workspaceName)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+
+        var result = await _workspaceService.GetPermissions(workspaceIdResult.Value);
+        return Ok(result);
     }
 }
