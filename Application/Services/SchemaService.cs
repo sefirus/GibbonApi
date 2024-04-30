@@ -4,6 +4,7 @@ using Core.Interfaces.Services;
 using Core.ViewModels;
 using Core.ViewModels.Schema;
 using DataAccess;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -66,7 +67,6 @@ public class SchemaService : ISchemaService
     public async Task<SchemaObject> RetrieveSchemaObject(Guid workspaceId, string schemaObjectName)
     {
         var schemaObject = await _context.SchemaObjects
-            .AsSplitQuery()
             .AsNoTracking()
             .Include(s => s.Fields.Where(sf => sf.ParentFieldId == null))
                 .ThenInclude(f => f.ChildFields!)
@@ -123,5 +123,29 @@ public class SchemaService : ISchemaService
                 PopulateFieldLookup(fieldLookup, field.ChildFields);
             }
         }
-    } 
+    }
+
+    public async Task<List<SchemaObject>> GetWorkspaceSchema(Guid workspaceId)
+    {
+        var schemaObjects = await _context.SchemaObjects
+            .AsNoTracking()
+            .Include(s => s.StoredDocuments)
+            .Include(s => s.Fields.Where(sf => sf.ParentFieldId == null))
+                    .ThenInclude(f => f.ChildFields!)
+                        .ThenInclude(chf => chf.ChildFields)
+            .Where(s => s.WorkspaceId == workspaceId)
+            .ToListAsync();
+
+        foreach (var schemaObject in schemaObjects)
+        {
+            var entryKey = new MemoryCacheKey()
+            {
+                WorkspaceId = workspaceId,
+                ObjectName = schemaObject.Name,
+                EntryType = MemoryCacheEntryType.SchemaObject
+            };
+            _memoryCache.Set(entryKey, schemaObject, TimeSpan.FromMinutes(15));
+        }
+        return schemaObjects;
+    }
 }

@@ -32,6 +32,16 @@ builder.Services.AddDbContext<GibbonDbContext>(options =>
     options.UseNpgsql(connectionString);
 });
 builder.Host.UseSerilog(); // <-- Add this line
+builder.Services.AddCors(corsOptions =>
+    {
+        corsOptions
+            .AddDefaultPolicy(corsPolicyBuilder => 
+                corsPolicyBuilder
+                    .WithOrigins("http://localhost:4200", "https://localhost:5001", "http://localhost:5283")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod());
+    }
+);
 
 var app = builder.Build();
 
@@ -45,6 +55,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors();
+
+//app.UseAuthentication();
 
 app.UseAuthorization();
 

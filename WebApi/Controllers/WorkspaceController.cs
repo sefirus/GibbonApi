@@ -10,10 +10,12 @@ namespace WebApi.Controllers;
 public class WorkspaceController : ControllerBase
 {
     private readonly IWorkspaceService _workspaceService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public WorkspaceController(IWorkspaceService workspaceService)
+    public WorkspaceController(IWorkspaceService workspaceService, ICurrentUserService currentUserService)
     {
         _workspaceService = workspaceService;
+        _currentUserService = currentUserService;
     }
 
     [HttpPost]
@@ -70,5 +72,42 @@ public class WorkspaceController : ControllerBase
 
         await _workspaceService.AssignPermission(workspaceIdResult.Value, permissionViewModel);
         return Ok();
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetUserWorkspaces()
+    {
+        var userId = _currentUserService.GetCurrentUserId();
+        if (userId.IsFailed)
+        {
+            return BadRequest("Can retrieve UserId from the token you provided.");
+        }
+
+        var userWorkspaces = await _workspaceService.GetUserWorkspaces(userId.Value);
+        return Ok(userWorkspaces);
+    }
+
+    [Authorize]
+    [HttpGet("{workspaceId:guid}")]
+    public async Task<IActionResult> GetWorkspaceSchema(Guid workspaceId)
+    {
+        var viewModel = await _workspaceService.GetWorkspace(workspaceId);
+        return Ok(viewModel);
+        
+    }
+    
+    [Authorize]
+    [HttpGet("{workspaceName}")]
+    public async Task<IActionResult> GetWorkspaceSchema(string workspaceName)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+
+        var viewModel = await _workspaceService.GetWorkspace(workspaceIdResult.Value);
+        return Ok(viewModel.Value);
     }
 }
