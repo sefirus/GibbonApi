@@ -12,4 +12,5 @@ public interface IWorkspaceService
     Task<Result> AssignPermission(Guid workspaceId, AssignPermissionViewModel assignPermissionViewModel);
     public Task<List<ReadWorkspaceViewModel>> GetUserWorkspaces(Guid userId);
     Task<Result<RichReadWorkspaceViewModel>> GetWorkspace(Guid workspaceId);
+    Task<List<WorkspacePermissionViewModel>> GetPermissions(Guid workspaceId);
 }

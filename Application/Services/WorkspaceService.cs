@@ -256,4 +256,18 @@ public class WorkspaceService : IWorkspaceService
         workspaceDetails.SchemaObjects = schema;
         return workspaceDetails;
     }
+
+    public Task<List<WorkspacePermissionViewModel>> GetPermissions(Guid workspaceId)
+    {
+        return _context.WorkspacePermissions
+            .Where(wp => wp.WorkspaceId == workspaceId)
+            .Select(wp => new WorkspacePermissionViewModel
+            {
+                UserId = wp.UserId,
+                Email = wp.User.Email,
+                UserName = wp.User.UserName,
+                Role = wp.WorkspaceRole.Name
+            })
+            .ToListAsync();
+    }
 }
