@@ -11,4 +11,5 @@ public interface IWorkspaceService
     Task<Result> RenameWorkspace(Guid workspaceId, string newName);
     Task<Result> AssignPermission(Guid workspaceId, AssignPermissionViewModel assignPermissionViewModel);
     public Task<List<ReadWorkspaceViewModel>> GetUserWorkspaces(Guid userId);
+    Task<Result<RichReadWorkspaceViewModel>> GetWorkspace(Guid workspaceId);
 }

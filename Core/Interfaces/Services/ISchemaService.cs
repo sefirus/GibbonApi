@@ -9,4 +9,5 @@ public interface ISchemaService
     Task<SchemaObject> RetrieveSchemaObject(Guid workspaceId, string schemaObjectName);
     Task<SchemaObject> GetSchemaObject(Guid workspaceId, string schemaObjectName);
     Task<Dictionary<Guid, SchemaField>> GetSchemaObjectLookup(Guid workspaceId, string schemaObjectName);
+    Task<List<SchemaObject>> GetWorkspaceSchema(Guid workspaceId);
 }

@@ -95,7 +95,7 @@ public static class StartupExtensions
                 AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
                 AllowOfflineAccess = true, // enable refresh tokens
                 RefreshTokenUsage = TokenUsage.OneTimeOnly,
-                ClientSecrets = {new Secret("tests_client_secret".ToSha256())},
+                ClientSecrets = {new Secret("angular_client_secret".ToSha256())},
                 AccessTokenLifetime = 6000,
             }
         };

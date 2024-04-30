@@ -150,12 +150,13 @@ public static class ServiceCollectionExtensions
 
                         string? userPermissionOnWorkspace = null;
                         var workspaceId = await GetWorkspaceId(context.HttpContext.RequestServices, routeData.Values);
+                        Guid workspaceIdValue;
                         if (workspaceId.IsSuccess)
                         {
-
+                            workspaceIdValue = workspaceId.Value;
                             userPermissionOnWorkspace = await dbContext.WorkspacePermissions
                                 .Where(wp => wp.UserId == userId
-                                             && wp.WorkspaceId == workspaceId.Value)
+                                             && wp.WorkspaceId == workspaceIdValue)
                                 .Select(wp => wp.WorkspaceRole.Name)
                                 .FirstOrDefaultAsync();
                             if (userPermissionOnWorkspace == null)
@@ -165,9 +166,13 @@ public static class ServiceCollectionExtensions
                                 return;
                             }
                         }
+                        else
+                        {
+                            workspaceIdValue = default;
+                        }
 
                         var workspaceRoleClaim = new Claim(ClaimTypes.Role, userPermissionOnWorkspace ?? string.Empty);
-                        var workspaceIdClaim = new Claim(RolesEnum.WorkspaceId, workspaceId.Value.ToString());
+                        var workspaceIdClaim = new Claim(RolesEnum.WorkspaceId, workspaceIdValue.ToString());
         
                         ((ClaimsIdentity)context.Principal.Identity).AddClaims(new[] { workspaceRoleClaim, workspaceIdClaim });
                     }

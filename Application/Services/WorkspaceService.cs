@@ -1,7 +1,9 @@
-﻿using Core.Entities;
+﻿using Application.Mappers;
+using Core.Entities;
 using Core.Enums;
 using Core.Exceptions;
 using Core.Interfaces.Services;
+using Core.ViewModels.Schema;
 using Core.ViewModels.Workspace;
 using DataAccess;
 using FluentResults;
@@ -13,13 +15,16 @@ public class WorkspaceService : IWorkspaceService
 {
     private readonly GibbonDbContext _context;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ISchemaService _schemaService;
 
     public WorkspaceService(
         GibbonDbContext context, 
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService, 
+        ISchemaService schemaService)
     {
         _context = context;
         _currentUserService = currentUserService;
+        _schemaService = schemaService;
     }
 
     public async Task<Result<Guid>> GetWorkspaceIdFromName(string? name)
@@ -198,5 +203,57 @@ public class WorkspaceService : IWorkspaceService
                 AccessLevel = w.RoleName
             })
             .ToListAsync();
+    }
+    
+    private async Task<LinkedList<SchemaObjectViewModel>> GetSchemaViewModels(Guid workspaceId)
+    {
+        var schema = new LinkedList<SchemaObjectViewModel>();
+        var schemaObjects = await _schemaService.GetWorkspaceSchema(workspaceId);
+        var schemaMapper = new SchemaObjectToVmMapper();
+        foreach (var schemaObject in schemaObjects)
+        {
+            var documentsCount = schemaObject.StoredDocuments.Count;
+            var fieldsCount = schemaObjects
+                .SelectMany(s => s.Fields)
+                .SelectMany(s => s.ChildFields ?? Enumerable.Empty<SchemaField>())
+                .SelectMany(s => s.ChildFields ?? Enumerable.Empty<SchemaField>())
+                .Count();
+            var viewModel = schemaMapper.Map(schemaObject);
+            viewModel.NumberOfDocuments = documentsCount;
+            viewModel.NumberOfFields = fieldsCount;
+            schema.AddLast(viewModel);
+        }
+
+        return schema;
+    }
+
+    public async Task<Result<RichReadWorkspaceViewModel>> GetWorkspace(Guid workspaceId)
+    {
+        var schema = await GetSchemaViewModels(workspaceId);
+
+        var userId = _currentUserService.GetCurrentUserId();
+        if (userId.IsFailed)
+        {
+            return Result.Fail("Can retrieve UserId from the token you provided.");
+        }
+
+        var workspaceDetails = await _context.Workspaces
+            .Select(w => new RichReadWorkspaceViewModel
+            {
+                Id = w.Id,
+                Name = w.Name,
+                AccessLevel = w.WorkspacePermissions.First(wp => wp.UserId == userId.Value).WorkspaceRole.Name,
+                Permissions = w.WorkspacePermissions.Select(wp => new WorkspacePermissionViewModel
+                {
+                    UserId = wp.UserId,
+                    Email = wp.User.Email,
+                    UserName = wp.User.UserName,
+                    Role = wp.WorkspaceRole.Name
+                })
+            })
+            .SingleAsync(w => w.Id == workspaceId);
+
+        workspaceDetails.SchemaObjects = schema;
+        return workspaceDetails;
     }
 }

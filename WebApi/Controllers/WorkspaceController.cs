@@ -87,4 +87,27 @@ public class WorkspaceController : ControllerBase
         var userWorkspaces = await _workspaceService.GetUserWorkspaces(userId.Value);
         return Ok(userWorkspaces);
     }
+
+    [Authorize]
+    [HttpGet("{workspaceId:guid}")]
+    public async Task<IActionResult> GetWorkspaceSchema(Guid workspaceId)
+    {
+        var viewModel = await _workspaceService.GetWorkspace(workspaceId);
+        return Ok(viewModel);
+        
+    }
+    
+    [Authorize]
+    [HttpGet("{workspaceName}")]
+    public async Task<IActionResult> GetWorkspaceSchema(string workspaceName)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+
+        var viewModel = await _workspaceService.GetWorkspace(workspaceIdResult.Value);
+        return Ok(viewModel.Value);
+    }
 }
