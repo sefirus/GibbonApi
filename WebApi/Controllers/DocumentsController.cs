@@ -61,11 +61,23 @@ public class DocumentsController : ControllerBase
     
     [Authorize(Roles = AccessLevels.GeneralAccess)]
     [HttpGet("{workspaceId:guid}/{objectName}")]
-    public async Task<IActionResult> GetDocument([FromRoute]string objectName, [FromRoute]Guid workspaceId, [FromQuery]string? pkValue)
+    public async Task<IActionResult> GetDocument([FromRoute]string objectName, [FromRoute]Guid workspaceId, [FromQuery]string? pkValue, [FromQuery]int? offset, [FromQuery]int? top)
     {
         if (pkValue is null)
         {
-            return BadRequest(); //TODO: implement get all 
+            offset ??= 0;
+            top ??= 100;
+            var documents = await _documentService.RetrieveDocuments(workspaceId, objectName, offset.Value, top.Value);
+            var jsons = StoredDocumentSerializer.SerializeDocuments(documents.Value);
+            if (jsons.IsFailed)
+            {
+                return StatusCode(500, new
+                {
+                    ErrorMessage = jsons.Errors.FirstOrDefault()?.Message
+                });
+            }
+
+            return Ok(jsons.Value.ToString(formatting: Formatting.Indented));
         }
         
         var documentResult = await _documentService.RetrieveDocument(workspaceId, objectName, pkValue);
@@ -74,31 +86,57 @@ public class DocumentsController : ControllerBase
             return NotFound();
         }
         var json = StoredDocumentSerializer.SerializeDocument(documentResult.Value);
+        if (json.IsFailed)
+        {
+            return StatusCode(500, new
+            {
+                ErrorMessage = json.Errors.FirstOrDefault()?.Message
+            });
+        }
         return Ok(json.Value.ToString(formatting: Formatting.Indented));
     }
     
     [Authorize(Roles = AccessLevels.GeneralAccess)]
     [HttpGet("{workspaceName}/{objectName}")]
-    public async Task<IActionResult> GetDocument([FromRoute] string objectName, [FromRoute] string workspaceName, [FromQuery] string? pkValue)
+    public async Task<IActionResult> GetDocument([FromRoute] string objectName, [FromRoute] string workspaceName, [FromQuery] string? pkValue, [FromQuery]int? offset, [FromQuery]int? top)
     {
-        if (pkValue is null)
-        {
-            return BadRequest(); //TODO: implement get all 
-        }
-
         var workspaceIdResult = this.GetWorkspaceId();
         if (workspaceIdResult.IsFailed)
         {
             return NotFound(workspaceIdResult.ToString());
         }
-    
+        
+        if (pkValue is null)
+        {
+            offset ??= 0;
+            top ??= 100;
+            var documents = await _documentService.RetrieveDocuments(workspaceIdResult.Value, objectName, offset.Value, top.Value);
+            var jsons = StoredDocumentSerializer.SerializeDocuments(documents.Value);
+            if (jsons.IsFailed)
+            {
+                return StatusCode(500, new
+                {
+                    ErrorMessage = jsons.Errors.FirstOrDefault()?.Message
+                });
+            }
+
+            return Ok(jsons.Value.ToString(formatting: Formatting.Indented));        
+        }
+
         var documentResult = await _documentService.RetrieveDocument(workspaceIdResult.Value, objectName, pkValue);
         if (!documentResult.IsSuccess)
         {
             return NotFound();
         }
         var json = StoredDocumentSerializer.SerializeDocument(documentResult.Value);
-        return Ok(json.Value.ToString(formatting: Formatting.Indented));
+        if (json.IsFailed)
+        {
+            return StatusCode(500, new
+            {
+                ErrorMessage = json.Errors.FirstOrDefault()?.Message
+            });
+        }
+        return Ok(json.Value.ToString(formatting: Formatting.Indented));    
     }
 
 }

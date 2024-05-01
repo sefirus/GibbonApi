@@ -72,13 +72,20 @@ public class DocumentService : IDocumentService
         return Result.Ok(document.Value);
     }
 
-    public async Task<Result<StoredDocument>> RetrieveDocument(Guid workspaceId, string objectName, string primaryKeyValue)
+    public async Task<Result<StoredDocument>> RetrieveDocument(Guid workspaceId, string objectName,
+        string primaryKeyValue)
     {
         var document = await _context.StoredDocuments
-            .Include(sd => sd.FieldValues)
-            .Where(sd => sd.FieldValues
-                .Any(fv => fv.SchemaFieldId == sd.PrimaryKeySchemaFieldId 
-                    && fv.Value == primaryKeyValue))
+            .AsNoTracking()
+            .Include(s => s.FieldValues
+                    .Where(sf => sf.ParentFieldId == null))
+                .ThenInclude(f => f.ChildFields!)
+                .ThenInclude(chf => chf.ChildFields)            
+            .Where(sd => sd.SchemaObject.WorkspaceId == workspaceId 
+                 && sd.SchemaObject.Name == objectName 
+                 && sd.FieldValues
+                     .Any(fv => fv.SchemaFieldId == sd.PrimaryKeySchemaFieldId
+                         && fv.Value == primaryKeyValue))
             .SingleOrDefaultAsync();
         if (document is null)
         {
@@ -98,13 +105,57 @@ public class DocumentService : IDocumentService
         return document;
     }
     
+    public async Task<Result<List<StoredDocument>>> RetrieveDocuments(Guid workspaceId, string objectName, int offset, int top)
+    {
+        var documents = await _context.StoredDocuments
+            .AsNoTracking()
+            .Include(s => s.FieldValues
+                    .Where(sf => sf.ParentFieldId == null))
+                .ThenInclude(f => f.ChildFields!)
+                .ThenInclude(chf => chf.ChildFields)
+            .Where(sd => sd.SchemaObject.WorkspaceId == workspaceId 
+                                                                         && sd.SchemaObject.Name == objectName )
+            .Skip(offset)
+            .Take(top)
+            .ToListAsync();
+
+        await EnrichStoredDocumentWithSchema(documents, workspaceId, objectName);
+        return documents;
+    }
+    
+    private async Task<List<StoredDocument>> EnrichStoredDocumentWithSchema(List<StoredDocument> documents, Guid workspaceId, string objectName, SchemaObject? schema=null)
+    {
+        schema ??= await _schemaService.GetSchemaObject(workspaceId, objectName);
+        foreach (var document in documents)
+        {
+            document.SchemaObject = schema;
+            var schemaObjectLookup = await _schemaService.GetSchemaObjectLookup(workspaceId, objectName);
+            EnrichFieldValuesWithSchemaFields(document, schemaObjectLookup);
+        }
+
+        return documents;
+    }
+    
     private void EnrichFieldValuesWithSchemaFields(StoredDocument document, Dictionary<Guid, SchemaField> fieldLookup)
     {
         foreach (var fieldValue in document.FieldValues)
         {
-            if (fieldLookup.TryGetValue(fieldValue.SchemaFieldId, out var field))
+            EnrichFieldValue(fieldValue, fieldLookup);
+        }
+    }
+
+    private void EnrichFieldValue(FieldValue fieldValue, Dictionary<Guid, SchemaField> fieldLookup)
+    {
+        if (fieldLookup.TryGetValue(fieldValue.SchemaFieldId, out var schemaField))
+        {
+            fieldValue.SchemaField = schemaField;
+        }
+
+        if (fieldValue.ChildFields != null)
+        {
+            foreach (var childFieldValue in fieldValue.ChildFields)
             {
-                fieldValue.SchemaField = field;
+                EnrichFieldValue(childFieldValue, fieldLookup);
             }
         }
     }

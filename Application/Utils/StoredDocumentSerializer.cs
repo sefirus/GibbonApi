@@ -29,6 +29,21 @@ public static class StoredDocumentSerializer
         return rootObject;
     }
     
+    public static Result<JArray> SerializeDocuments(IEnumerable<StoredDocument> documents)
+    {
+        var resultArray = new JArray();
+        foreach (var document in documents)
+        {
+            var result = SerializeDocument(document);
+            if (result.IsFailed)
+            {
+                return Result.Fail<JArray>(result.Errors);
+            }
+            resultArray.Add(result.Value);
+        }
+        return Result.Ok(resultArray);
+    }
+    
     private static void AddFieldToJObject(JObject parentObject, FieldValue fieldValue)
     {
         var schemaField = fieldValue.SchemaField;
