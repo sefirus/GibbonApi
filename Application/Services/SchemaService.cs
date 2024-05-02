@@ -26,7 +26,7 @@ public class SchemaService : ISchemaService
         _schemaFieldsMapper = schemaFieldsMapper;
     }
     
-    public async Task CreateWorkspaceObject(Guid workspaceId, string name, Dictionary<string, SchemaFieldViewModel> viewModel)
+    public async Task CreateShemaObject(Guid workspaceId, string name, Dictionary<string, SchemaFieldViewModel> viewModel)
     {
         var workspace = await _context.Workspaces.SingleAsync(w => w.Id == workspaceId);
         var newSchemaObject = new SchemaObject()
@@ -147,5 +147,34 @@ public class SchemaService : ISchemaService
             _memoryCache.Set(entryKey, schemaObject, TimeSpan.FromMinutes(15));
         }
         return schemaObjects;
+    }
+
+    public async Task<Result> DeleteSchemaObject(Guid workspaceId, string objectName)
+    {
+        var schemaId = await _context.SchemaObjects
+            .Where(s => s.WorkspaceId == workspaceId && s.Name == objectName)
+            .Select(s => s.Id)
+            .FirstOrDefaultAsync();
+        if (schemaId == default)
+        {
+            return Result.Fail($"Scheme {objectName} does not exists in the provided workspace.");
+        }
+
+        await _context.FieldValues
+            .Where(fv => fv.SchemaField.SchemaObjectId == schemaId)
+            .DeleteFromQueryAsync();
+        
+        await _context.StoredDocuments
+            .Where(d => d.SchemaObjectId == schemaId)
+            .DeleteFromQueryAsync();
+
+        await _context.SchemaFields
+            .Where(sf => sf.SchemaObjectId == schemaId)
+            .DeleteFromQueryAsync();
+        
+        await _context.SchemaObjects
+            .Where(sf => sf.Id == schemaId)
+            .DeleteFromQueryAsync();
+        return Result.Ok();
     }
 }
