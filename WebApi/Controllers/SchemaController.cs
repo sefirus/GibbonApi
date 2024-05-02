@@ -54,7 +54,7 @@ public class SchemaController : ControllerBase
         [FromRoute]string objectName,
         [FromBody]Dictionary<string, SchemaFieldViewModel> objectViewModel)
     {
-        await _schemaService.CreateWorkspaceObject(workspaceId, objectName, objectViewModel);
+        await _schemaService.CreateShemaObject(workspaceId, objectName, objectViewModel);
         return Ok();
     }
     
@@ -71,7 +71,45 @@ public class SchemaController : ControllerBase
             return NotFound(workspaceIdResult.ToString());
         }
 
-        await _schemaService.CreateWorkspaceObject(workspaceIdResult.Value, objectName, objectViewModel);
+        await _schemaService.CreateShemaObject(workspaceIdResult.Value, objectName, objectViewModel);
+        return Ok();
+    }
+
+    [Authorize(Roles = AccessLevels.AdminAccess)]
+    [HttpDelete("{workspaceId:guid}/{objectName}")]
+    public async Task<IActionResult> DeleteSchemaObject([FromRoute] Guid workspaceId, [FromRoute] string objectName)
+    {
+        var result = await _schemaService.DeleteSchemaObject(workspaceId, objectName);
+        if (result.IsFailed)
+        {
+            return BadRequest(new
+            {
+                ErrorMessage = result.Errors.FirstOrDefault()?.Message
+            });
+        }
+
+        return Ok();
+    }
+    
+    [Authorize(Roles = AccessLevels.AdminAccess)]
+    [HttpDelete("{workspaceName}/{objectName}")]
+    public async Task<IActionResult> DeleteSchemaObject([FromRoute]string workspaceName, [FromRoute]string objectName)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+
+        var result = await _schemaService.DeleteSchemaObject(workspaceIdResult.Value, objectName);
+        if (result.IsFailed)
+        {
+            return BadRequest(new
+            {
+                ErrorMessage = result.Errors.FirstOrDefault()?.Message
+            });
+        }
+
         return Ok();
     }
 
