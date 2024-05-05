@@ -69,6 +69,59 @@ public static class StoredDocumentDifferentiator
         return !DataTypesEnum.IsValueDataType(actual.SchemaField.DataTypeId)
                && !DataTypesEnum.IsValueDataType(expected.SchemaField.DataTypeId);
     }
+
+    public static Result<Dictionary<Guid, MismatchType>> GetAllDocumentMismatches(StoredDocument actual, StoredDocument expected)
+    {
+        if (actual == null && expected == null)
+        {
+            return Result.Ok();
+        }
+        if (actual == null || expected == null)
+        {
+            return Result.Fail("One of the documents is null");
+        }
+
+        var allDocumentsMismatches = new Dictionary<Guid, MismatchType>();
+
+        foreach (var actualFieldValue in actual.FieldValues)
+        {
+            var matchingFieldValue = expected.FieldValues.FirstOrDefault(ev => ev.SchemaFieldId == actualFieldValue.SchemaFieldId);
+            if (matchingFieldValue == null)
+            {
+                allDocumentsMismatches.TryAdd(actualFieldValue.Id, MismatchType.FieldDoesNotExist);
+                continue;
+            }
+            GatherFieldValuesMismatches(actualFieldValue, matchingFieldValue, allDocumentsMismatches);
+        }
+
+        return allDocumentsMismatches;
+    }
+    
+    private static void GatherFieldValuesMismatches(FieldValue actual, FieldValue expected, Dictionary<Guid, MismatchType> mismatches)
+    {
+        if (!AreFieldValuesEquivalent(actual, expected))
+        {
+            mismatches.TryAdd(actual.Id, MismatchType.FieldValueDiffers);
+            return;
+        }
+        var actualChildren = actual.ChildFields ?? Enumerable.Empty<FieldValue>();
+        var expectedChildren = expected.ChildFields ?? Enumerable.Empty<FieldValue>();
+        
+        foreach (var child in actualChildren)
+        {
+            var matchingChild = expectedChildren
+                .FirstOrDefault(ec => DataTypesEnum.IsValueDataType(child.SchemaField.DataTypeId) 
+                    ? ec.SchemaFieldId == child.SchemaFieldId && ec.Value == child.Value
+                    : ec.SchemaFieldId == child.SchemaFieldId);
+            if (matchingChild == null)
+            {
+                mismatches.TryAdd(child.Id, MismatchType.FieldDoesNotExist);
+                continue;
+            }
+
+            GatherFieldValuesMismatches(child, matchingChild, mismatches);
+        }
+    }
 }
 
 internal class Path
@@ -94,4 +147,10 @@ internal class Path
     {
         return string.Join("", _nodes);
     }
+}
+
+public enum MismatchType
+{
+    FieldDoesNotExist,
+    FieldValueDiffers
 }
