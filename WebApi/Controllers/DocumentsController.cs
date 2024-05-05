@@ -29,7 +29,10 @@ public class DocumentsController : ControllerBase
         var result = await _documentService.SaveDocumentFromRequest(workspaceId, objectName, buffer);
         if (result.IsFailed)
         {
-            return BadRequest(result.Errors);
+            return BadRequest(new
+            {
+                ErrorMessage = result.Errors.FirstOrDefault()?.Message
+            });
         }
         var json = StoredDocumentSerializer.SerializeDocument(result.Value);
         return Ok(json.Value);
@@ -52,7 +55,10 @@ public class DocumentsController : ControllerBase
         var result = await _documentService.SaveDocumentFromRequest(workspaceIdResult.Value, objectName, buffer);
         if (result.IsFailed)
         {
-            return BadRequest(result.Errors);
+            return BadRequest(new
+            {
+                ErrorMessage = result.Errors.FirstOrDefault()?.Message
+            });
         }
         var json = StoredDocumentSerializer.SerializeDocument(result.Value);
         return Ok(json.Value);

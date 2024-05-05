@@ -66,10 +66,30 @@ public class DocumentService : IDocumentService
         if (!validationResult.IsValid)
         { 
             return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
-        }        
+        }
+
+        var isPkOccupied = await IsDocumentWithPkExists(workspaceId, objectName, document.Value);
+        if (isPkOccupied)
+        {
+            return Result.Fail("Stored document with the same primary key value is already exist.");
+        }
         await SaveDocumentToDb(document.Value);
         await EnrichStoredDocumentWithSchema(document.Value, workspaceId, objectName, schemaObject);
         return Result.Ok(document.Value);
+    }
+
+    private async Task<bool> IsDocumentWithPkExists(Guid workspaceId, string objectName, StoredDocument newDocument)
+    {
+        var primaryKeyField = newDocument.FieldValues
+            .Single(fv => fv.SchemaFieldId == newDocument.PrimaryKeySchemaFieldId);
+        var isDocumentExists = await _context.StoredDocuments
+            .Where(sd => sd.SchemaObject.WorkspaceId == workspaceId 
+                         && sd.SchemaObject.Name == objectName 
+                         && sd.FieldValues
+                             .Any(fv => fv.SchemaFieldId == sd.PrimaryKeySchemaFieldId
+                                        && fv.Value == primaryKeyField.Value))
+            .AnyAsync();
+        return isDocumentExists;
     }
 
     public async Task<Result<StoredDocument>> RetrieveDocument(Guid workspaceId, string objectName,
