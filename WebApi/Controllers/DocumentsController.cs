@@ -145,4 +145,28 @@ public class DocumentsController : ControllerBase
         return Ok(json.Value.ToString(formatting: Formatting.Indented));    
     }
 
+    [Authorize(Roles = AccessLevels.GeneralAccess)]
+    [HttpPut("{workspaceName}/{objectName}")]
+    public async Task<IActionResult> UpdateDocument(string objectName, string workspaceName)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+
+        using var bufferStream = new MemoryStream();
+        await HttpContext.Request.Body.CopyToAsync(bufferStream);
+        Memory<byte> buffer = bufferStream.ToArray();
+
+        var result = await _documentService.UpdateDocumentFromRequest(workspaceIdResult.Value, objectName, buffer);
+        if (result.IsFailed)
+        {
+            return BadRequest(new
+            {
+                ErrorMessage = result.Errors.FirstOrDefault()?.Message
+            });
+        }
+        return Ok();
+    }
 }

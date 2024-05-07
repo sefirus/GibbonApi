@@ -70,7 +70,7 @@ public static class StoredDocumentDifferentiator
                && !DataTypesEnum.IsValueDataType(expected.SchemaField.DataTypeId);
     }
 
-    public static Result<Dictionary<Guid, MismatchType>> GetAllDocumentMismatches(StoredDocument actual, StoredDocument expected)
+    public static Result<Dictionary<Guid, FieldValue>> GetAllDocumentMismatches(StoredDocument actual, StoredDocument expected)
     {
         if (actual == null && expected == null)
         {
@@ -81,14 +81,14 @@ public static class StoredDocumentDifferentiator
             return Result.Fail("One of the documents is null");
         }
 
-        var allDocumentsMismatches = new Dictionary<Guid, MismatchType>();
+        var allDocumentsMismatches = new Dictionary<Guid, FieldValue>();
 
         foreach (var actualFieldValue in actual.FieldValues)
         {
             var matchingFieldValue = expected.FieldValues.FirstOrDefault(ev => ev.SchemaFieldId == actualFieldValue.SchemaFieldId);
             if (matchingFieldValue == null)
             {
-                allDocumentsMismatches.TryAdd(actualFieldValue.Id, MismatchType.FieldDoesNotExist);
+                allDocumentsMismatches.TryAdd(actualFieldValue.Id, actualFieldValue);
                 continue;
             }
             GatherFieldValuesMismatches(actualFieldValue, matchingFieldValue, allDocumentsMismatches);
@@ -97,11 +97,11 @@ public static class StoredDocumentDifferentiator
         return allDocumentsMismatches;
     }
     
-    private static void GatherFieldValuesMismatches(FieldValue actual, FieldValue expected, Dictionary<Guid, MismatchType> mismatches)
+    private static void GatherFieldValuesMismatches(FieldValue actual, FieldValue expected, Dictionary<Guid, FieldValue> mismatches)
     {
         if (!AreFieldValuesEquivalent(actual, expected))
         {
-            mismatches.TryAdd(actual.Id, MismatchType.FieldValueDiffers);
+            mismatches.TryAdd(actual.Id, actual);
             return;
         }
         var actualChildren = actual.ChildFields ?? Enumerable.Empty<FieldValue>();
@@ -115,7 +115,7 @@ public static class StoredDocumentDifferentiator
                     : ec.SchemaFieldId == child.SchemaFieldId);
             if (matchingChild == null)
             {
-                mismatches.TryAdd(child.Id, MismatchType.FieldDoesNotExist);
+                mismatches.TryAdd(child.Id, child);
                 continue;
             }
 
@@ -147,10 +147,4 @@ internal class Path
     {
         return string.Join("", _nodes);
     }
-}
-
-public enum MismatchType
-{
-    FieldDoesNotExist,
-    FieldValueDiffers
 }
