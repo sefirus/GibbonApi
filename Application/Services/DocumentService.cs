@@ -1,13 +1,10 @@
 ﻿using Application.Utils;
 using Application.Validators;
 using Core.Entities;
-using Core.Enums;
 using Core.Interfaces.Services;
 using DataAccess;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
-
 namespace Application.Services;
 
 public class DocumentService : IDocumentService
@@ -26,16 +23,21 @@ public class DocumentService : IDocumentService
         _documentValidator = documentValidator;
     }
 
-    private static void ResetSchemaFieldRecursive(FieldValue fieldValue)
+    private static void ResetSchemaFieldRecursive(FieldValue fieldValue, Guid? newStoredDocumentId = null)
     {
         fieldValue.SchemaField = null;
+        if (newStoredDocumentId is not null)
+        {
+            fieldValue.Document = null;
+            fieldValue.DocumentId = newStoredDocumentId.Value;
+        }
         if (fieldValue.ChildFields == null)
         {
             return;
         }
         foreach (var childFieldValue in fieldValue.ChildFields)
         {
-            ResetSchemaFieldRecursive(childFieldValue);
+            ResetSchemaFieldRecursive(childFieldValue, newStoredDocumentId);
         }
     }
     
@@ -53,6 +55,31 @@ public class DocumentService : IDocumentService
 
     public async Task<Result<StoredDocument>> SaveDocumentFromRequest(Guid workspaceId, string objectName, ReadOnlyMemory<byte> buffer)
     {
+        var document = await GetStoredDocumentFromRequest(workspaceId, objectName, buffer);
+        if (document.IsFailed)
+        {
+            return document;
+        }
+
+        return await SaveStoredDocument(workspaceId, objectName, document);
+    }
+
+    private async Task<Result<StoredDocument>> SaveStoredDocument(Guid workspaceId, string objectName, Result<StoredDocument> document)
+    {
+        var isPkOccupied = await IsDocumentWithPkExists(workspaceId, objectName, document.Value);
+        if (isPkOccupied)
+        {
+            return Result.Fail("Stored document with the same primary key value is already exist.");
+        }
+
+        await SaveDocumentToDb(document.Value);
+        var schemaObject = await _schemaService.GetSchemaObject(workspaceId, objectName);
+        await EnrichStoredDocumentWithSchema(document.Value, workspaceId, objectName, schemaObject);
+        return Result.Ok(document.Value);
+    }
+
+    private async Task<Result<StoredDocument>> GetStoredDocumentFromRequest(Guid workspaceId, string objectName, ReadOnlyMemory<byte> buffer)
+    {
         var schemaObject = await _schemaService.GetSchemaObject(workspaceId, objectName);
         var parser = new StoredDocumentJsonParser(schemaObject);
         var document = parser.ParseJsonToStoredDocument(buffer.Span);
@@ -62,14 +89,27 @@ public class DocumentService : IDocumentService
         }
 
         var validationResult = await _documentValidator.ValidateAsync(document.Value);
-        
+
         if (!validationResult.IsValid)
-        { 
+        {
             return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
-        }        
-        await SaveDocumentToDb(document.Value);
-        await EnrichStoredDocumentWithSchema(document.Value, workspaceId, objectName, schemaObject);
-        return Result.Ok(document.Value);
+        }
+
+        return document.Value;
+    }
+
+    private async Task<bool> IsDocumentWithPkExists(Guid workspaceId, string objectName, StoredDocument newDocument)
+    {
+        var primaryKeyField = newDocument.FieldValues
+            .Single(fv => fv.SchemaFieldId == newDocument.PrimaryKeySchemaFieldId);
+        var isDocumentExists = await _context.StoredDocuments
+            .Where(sd => sd.SchemaObject.WorkspaceId == workspaceId 
+                         && sd.SchemaObject.Name == objectName 
+                         && sd.FieldValues
+                             .Any(fv => fv.SchemaFieldId == sd.PrimaryKeySchemaFieldId
+                                        && fv.Value == primaryKeyField.Value))
+            .AnyAsync();
+        return isDocumentExists;
     }
 
     public async Task<Result<StoredDocument>> RetrieveDocument(Guid workspaceId, string objectName,
@@ -95,6 +135,90 @@ public class DocumentService : IDocumentService
         await EnrichStoredDocumentWithSchema(document, workspaceId, objectName);
         return document;
     }
+
+    public async Task<Result<StoredDocument>> UpdateDocumentFromRequest_deprecated(Guid workspaceId, string objectName,
+        ReadOnlyMemory<byte> buffer)
+    {
+        var schemaObject = await _schemaService.GetSchemaObject(workspaceId, objectName);
+        var parser = new StoredDocumentJsonParser(schemaObject);
+        var document = parser.ParseJsonToStoredDocument(buffer.Span);
+        if (document.IsFailed)
+        {
+            return Result.Fail<StoredDocument>(document.Errors);
+        }
+
+        var validationResult = await _documentValidator.ValidateAsync(document.Value);
+        
+        if (!validationResult.IsValid)
+        { 
+            return Result.Fail<StoredDocument>(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+        
+        var primaryKeyField = document.Value.FieldValues
+            .Single(fv => fv.SchemaFieldId == document.Value.PrimaryKeySchemaFieldId);
+        var existingDocument = await RetrieveDocument(workspaceId, objectName, primaryKeyField.Value);
+        if (existingDocument.IsFailed)
+        {
+            return Result.Fail(existingDocument.Errors.FirstOrDefault()?.Message);
+        }
+
+        var fieldValuesToAdd = StoredDocumentDifferentiator.GetAllDocumentMismatches(document.Value, existingDocument.Value);
+        var fieldValuesToRemove = StoredDocumentDifferentiator.GetAllDocumentMismatches(existingDocument.Value, document.Value);
+        if (fieldValuesToAdd.IsFailed || fieldValuesToRemove.IsFailed)
+        {
+            return Result.Fail("Can not updated the Document.");
+        }
+
+        await _context.FieldValues
+            .Where(fv => fieldValuesToRemove.Value.Keys.Contains(fv.Id))
+            .DeleteFromQueryAsync();
+        
+        foreach (var fv in fieldValuesToAdd.Value)
+        {
+            ResetSchemaFieldRecursive(fv.Value, newStoredDocumentId: existingDocument.Value.Id);
+        }
+        //TODO: fix excessive fields in root object after update
+        await _context.AddRangeAsync(fieldValuesToAdd.Value.Values);
+        await _context.SaveChangesAsync();
+        await EnrichStoredDocumentWithSchema(document.Value, workspaceId, objectName, schemaObject);
+        return document.Value;
+    }
+
+    public async Task<Result<StoredDocument>> UpdateDocumentFromRequest(Guid workspaceId, string objectName, ReadOnlyMemory<byte> buffer)
+    {
+        var document = await GetStoredDocumentFromRequest(workspaceId, objectName, buffer);
+        if (document.IsFailed)
+        {
+            return document;
+        }
+        var primaryKeyField = document.Value.FieldValues
+            .Single(fv => fv.SchemaFieldId == document.Value.PrimaryKeySchemaFieldId);
+        var deleteResult = await DeleteStoredDocument(workspaceId, objectName, primaryKeyField.Value);
+        if (deleteResult.IsFailed)
+        {
+            return deleteResult;
+        }
+        return await SaveDocumentFromRequest(workspaceId, objectName, buffer);
+    }
+
+    public async Task<Result> DeleteStoredDocument(Guid workspaceId, string objectName, string pkValue)
+    {
+        var existingDocument = await RetrieveDocument(workspaceId, objectName, pkValue);
+        if (existingDocument.IsFailed)
+        {
+            return Result.Fail(existingDocument.Errors.FirstOrDefault()?.Message);
+        }
+        
+        await _context.FieldValues
+            .Where(fv => fv.DocumentId == existingDocument.Value.Id)
+            .DeleteFromQueryAsync();
+
+        await _context.StoredDocuments
+            .Where(sd => sd.Id == existingDocument.Value.Id)
+            .DeleteFromQueryAsync();
+        return Result.Ok();
+    }
+
 
     public async Task<StoredDocument> EnrichStoredDocumentWithSchema(StoredDocument document, Guid workspaceId, string objectName, SchemaObject? schema=null)
     {

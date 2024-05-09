@@ -1,4 +1,6 @@
-﻿namespace Core.Entities;
+﻿using Core.Enums;
+
+namespace Core.Entities;
 
 public class FieldValue
 {
@@ -11,4 +13,9 @@ public class FieldValue
     public FieldValue? ParentField { get; set; }
     public IEnumerable<FieldValue>? ChildFields { get; set; }
     public string Value { get; set; }
+
+    public override string ToString()
+    {
+        return $"{SchemaField?.FieldName ?? string.Empty } {DataTypesEnum.DataTypes.FirstOrDefault(dt => dt.Id == SchemaField?.DataTypeId)?.Name ?? string.Empty} Value: {Value}";
+    }
 }
