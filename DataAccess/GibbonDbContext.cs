@@ -29,7 +29,13 @@ public class GibbonDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
         modelBuilder.SeedAdmin();
         modelBuilder.SeedDataTypes();
     }
-    
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.LogTo(Console.WriteLine);
+        base.OnConfiguring(optionsBuilder);
+    }
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entries = ChangeTracker

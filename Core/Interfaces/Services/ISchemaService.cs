@@ -12,4 +12,5 @@ public interface ISchemaService
     Task<Dictionary<Guid, SchemaField>> GetSchemaObjectLookup(Guid workspaceId, string schemaObjectName);
     Task<List<SchemaObject>> GetWorkspaceSchema(Guid workspaceId);
     Task<Result> DeleteSchemaObject(Guid workspaceId, string objectName);
+    Task<bool> IsSchemaObjectExists(Guid workspaceId, string objectName);
 }

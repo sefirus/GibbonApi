@@ -41,7 +41,7 @@ public static class DataTypesEnum
                 return Int;
             case "str" or "char":
                 return Int;
-            case "floating" or "flt" or "fltng":
+            case "floating" or "flt" or "fltng" or "Number":
                 return Float;
             case "objid" or "id":
                 return ObjectId;
