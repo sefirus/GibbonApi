@@ -177,4 +177,11 @@ public class SchemaService : ISchemaService
             .DeleteFromQueryAsync();
         return Result.Ok();
     }
+
+    public async Task<bool> IsSchemaObjectExists(Guid workspaceId, string objectName)
+    {
+        var isExist = await _context.SchemaObjects
+            .AnyAsync(s => s.WorkspaceId == workspaceId && s.Name == objectName);
+        return isExist;
+    }
 }

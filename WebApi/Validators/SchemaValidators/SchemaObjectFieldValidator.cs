@@ -19,9 +19,12 @@ public class SchemaObjectFieldValidator : AbstractValidator<KeyValuePair<string,
     public SchemaObjectFieldValidator()
     {
         RuleFor(kp => kp.Key)
-            .NotNull().WithMessage("Property name cannot be null.")
-            .NotEmpty().WithMessage("Property name cannot be empty.")
-            .Must(BeValidPropertyName).WithMessage("Invalid property name.");
+            .NotNull()
+                .WithMessage("Property name cannot be null.")
+            .NotEmpty()
+                .WithMessage("Property name cannot be empty.")
+            .Must(BeValidPropertyName)
+                .WithMessage("Invalid property name.");
 
         RuleFor(kp => kp.Value)
             .SetValidator(new SchemaFieldViewModelValidator());

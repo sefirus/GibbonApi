@@ -65,6 +65,7 @@ public static class Seed
             new DataType { Id = DataTypeIdsEnum.UuidId, Name = DataTypesEnum.Uuid, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
             new DataType { Id = DataTypeIdsEnum.ObjectId, Name = DataTypesEnum.Object, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
             new DataType { Id = DataTypeIdsEnum.ArrayId, Name = DataTypesEnum.Array, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
+            new DataType { Id = DataTypeIdsEnum.BooleanId, Name = DataTypesEnum.Boolean, CreatedDate = DateTime.UtcNow, ModifiedDate = DateTime.UtcNow },
         };
         
 

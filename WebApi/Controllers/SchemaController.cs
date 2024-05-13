@@ -113,4 +113,47 @@ public class SchemaController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = AccessLevels.AdminAccess)]
+    [HttpPost("{workspaceId:guid}/{objectName}/Validate")]
+    public async Task<IActionResult> ValidateSchema(
+        [FromRoute]Guid workspaceId, 
+        [FromRoute]string objectName,
+        [FromBody]Dictionary<string, SchemaFieldViewModel> objectViewModel)
+    {
+        var isDuplicate = await _schemaService.IsSchemaObjectExists(workspaceId, objectName);
+        if (isDuplicate)
+        {
+            return BadRequest(new
+            {
+                ErrorMessage = $"SchemaObject with name {objectName} already exist"
+            });
+        }
+        return Ok();
+    }
+
+    
+    [Authorize(Roles = AccessLevels.AdminAccess)]
+    [HttpPost("{workspaceName}/{objectName}/Validate")]
+    public async Task<IActionResult> ValidateSchema(
+        [FromRoute]string workspaceName, 
+        [FromRoute]string objectName,
+        [FromBody]Dictionary<string, SchemaFieldViewModel> objectViewModel)
+    {
+        var workspaceIdResult = this.GetWorkspaceId();
+        if (workspaceIdResult.IsFailed)
+        {
+            return NotFound(workspaceIdResult.ToString());
+        }
+
+        var isDuplicate = await _schemaService.IsSchemaObjectExists(workspaceIdResult.Value, objectName);
+        if (isDuplicate)
+        {
+            return BadRequest(new
+            {
+                Errors = new []{ $"SchemaObject with name {objectName} already exist" }
+            });
+        }
+        return Ok();
+    }
+
 }
