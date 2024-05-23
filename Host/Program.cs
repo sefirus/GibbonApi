@@ -64,4 +64,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080"; // Default to 8080 if PORT not set
+app.Urls.Add($"https://*:{port}");
+
 app.Run();
