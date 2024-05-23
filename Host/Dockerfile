@@ -9,17 +9,18 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["Host/Host.csproj", "Host/"]
 RUN dotnet restore "Host/Host.csproj"
+# Copy the whole source except appsettings files
 COPY . .
+RUN rm -f Host/appsettings*.json  # Removing appsettings files from the build context
 WORKDIR "/src/Host"
 RUN dotnet build "Host.csproj" -c Release -o /app/build
 
-# Publish the application to a specific subdirectory.
+# Publish the application.
 FROM build AS publish
-RUN dotnet publish "Host.csproj" -c Release -o /app/publish/host
+RUN dotnet publish "Host.csproj" -c Release -o /app/publish
 
 # Final stage/image.
 FROM base AS final
 WORKDIR /app
-# Ensure to copy from the specific subdirectory.
-COPY --from=publish /app/publish/host .
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Host.dll"]
