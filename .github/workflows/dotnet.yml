@@ -46,8 +46,9 @@ jobs:
     - name: Build and Push Host Docker Image
       env:
         HEROKU_APP_NAME: gibbon-api
+        ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}
       run: |
-        docker build -t registry.heroku.com/${HEROKU_APP_NAME}/web -f Host/Dockerfile .
+        docker build -t registry.heroku.com/${HEROKU_APP_NAME}/web -f Host/Dockerfile --build-arg ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection} .
         docker push registry.heroku.com/${HEROKU_APP_NAME}/web
 
     # - name: Release IdentityServer Docker Image
