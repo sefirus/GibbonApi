@@ -11,7 +11,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -26,3 +25,39 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Login to Heroku Docker registry
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: heroku container:login
+
+    # - name: Build and Push IdentityServer Docker Image
+    #   env:
+    #     HEROKU_APP_NAME: your-identityserver-app-name
+    #   run: |
+    #     docker build -t registry.heroku.com/${HEROKU_APP_NAME}/web -f IdentityServer/Dockerfile .
+    #     docker push registry.heroku.com/${HEROKU_APP_NAME}/web
+
+    - name: Build and Push Host Docker Image
+      env:
+        HEROKU_APP_NAME: gibbon-api
+      run: |
+        docker build -t registry.heroku.com/${HEROKU_APP_NAME}/web -f Host/Dockerfile .
+        docker push registry.heroku.com/${HEROKU_APP_NAME}/web
+
+    # - name: Release IdentityServer Docker Image
+    #   env:
+    #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+    #     HEROKU_APP_NAME: your-identityserver-app-name
+    #   run: heroku container:release web --app ${HEROKU_APP_NAME}
+
+    - name: Release Host Docker Image
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        HEROKU_APP_NAME: gibbon-api
+      run: heroku container:release web --app ${HEROKU_APP_NAME}
