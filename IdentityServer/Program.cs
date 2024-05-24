@@ -1,4 +1,5 @@
 using IdentityServer;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +24,24 @@ builder.Services.AddCors(corsOptions =>
     }
 );
 
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    });
+}
+
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{ 
+    app.UseHttpsRedirection();
+}
+else
+{
+    app.UseForwardedHeaders();
+}
 
 app.UseCors();
 
@@ -35,7 +51,7 @@ app.UseIdentityServer();
 
 app.MapControllers();
 
-//var port = Environment.GetEnvironmentVariable("PORT") ?? "8080"; // Default to 8080 if PORT not set
-//app.Urls.Add($"http://*:{port}");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080"; // Default to 8080 if PORT not set
+app.Urls.Add($"http://*:{port}");
 
 app.Run();
