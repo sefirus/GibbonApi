@@ -23,7 +23,7 @@ builder.Services
     .AddApplicationPart(typeof(WorkspaceController).Assembly)
     .AddJsonOptions(options => options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
 builder.Services.ConfigureSwagger();
-builder.Services.ConfigureWorkspacePermissionsAuth();
+builder.Services.ConfigureWorkspacePermissionsAuth(builder.Configuration);
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddLogger(connectionString);
 builder.Services.AddValidatorsFromAssemblyContaining<CreateSchemaObjectViewModelValidator>();
@@ -31,13 +31,17 @@ builder.Services.AddDbContext<GibbonDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
-builder.Host.UseSerilog(); // <-- Add this line
+builder.Host.UseSerilog(); 
+
+string[] origins = builder.Configuration["AllowedOrigins"]?
+    .Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries) 
+    ?? Array.Empty<string>();
 builder.Services.AddCors(corsOptions =>
     {
         corsOptions
             .AddDefaultPolicy(corsPolicyBuilder => 
                 corsPolicyBuilder
-                    .WithOrigins("http://localhost:4200", "https://localhost:5001", "http://localhost:5283")
+                    .WithOrigins(origins)
                     .AllowAnyHeader()
                     .AllowAnyMethod());
     }

@@ -118,13 +118,14 @@ public static class ServiceCollectionExtensions
         return workspaceId;
     }
 
-    public static void ConfigureWorkspacePermissionsAuth(this IServiceCollection services)
+    public static void ConfigureWorkspacePermissionsAuth(this IServiceCollection services, IConfiguration configuration)
     {
+        var authAuthority = configuration["AuthAuthority"];
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = "https://localhost:7030";
+                options.Authority = authAuthority;
                 options.Audience = "GibbonApi";
                 options.TokenValidationParameters.ValidTypes = new[] { "at+jwt" };
                 options.IncludeErrorDetails = true;
