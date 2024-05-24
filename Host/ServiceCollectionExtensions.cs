@@ -129,6 +129,7 @@ public static class ServiceCollectionExtensions
                 options.Audience = "GibbonApi";
                 options.TokenValidationParameters.ValidTypes = new[] { "at+jwt" };
                 options.IncludeErrorDetails = true;
+                options.RequireHttpsMetadata = false;
                 options.Events = new JwtBearerEvents()
                 {
                     OnTokenValidated = async context =>
