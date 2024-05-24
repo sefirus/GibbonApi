@@ -2,6 +2,8 @@
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
+EXPOSE 5100
+EXPOSE 7030
 EXPOSE $PORT
 
 # Build the application
