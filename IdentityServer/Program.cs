@@ -8,7 +8,7 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddControllers();
 
 var config = builder.Configuration;
-builder.Services.AddServices(config);
+builder.Services.AddServices(config, builder.Environment);
 
 string[] origins = builder.Configuration["AllowedOrigins"]?
     .Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries) 
@@ -24,25 +24,9 @@ builder.Services.AddCors(corsOptions =>
     }
 );
 
-if (!builder.Environment.IsDevelopment())
-{
-    builder.Services.Configure<ForwardedHeadersOptions>(options =>
-    {
-        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    });
-}
-
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{ 
-    app.UseHttpsRedirection();
-    app.UseForwardedHeaders();
-}
-else
-{
-    app.UseForwardedHeaders();
-}
+app.UseHttpsRedirection();
 
 app.UseCors();
 

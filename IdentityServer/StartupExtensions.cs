@@ -11,7 +11,7 @@ namespace IdentityServer;
 
 public static class StartupExtensions
 {
-    public static void AddServices(this IServiceCollection services, IConfiguration config)
+    public static void AddServices(this IServiceCollection services, IConfiguration config, IWebHostEnvironment environment)
     {
         services.AddDbContext<GibbonDbContext>(opts => 
             opts.UseNpgsql(config.GetConnectionString("DefaultConnection")));
@@ -29,7 +29,13 @@ public static class StartupExtensions
 
         var assembly = typeof(Program).Assembly.GetName().Name;
 
-        services.AddIdentityServer()
+        services.AddIdentityServer(opts =>
+            {
+                if (!environment.IsDevelopment())
+                {
+                    opts.IssuerUri = config["AuthAuthority"];
+                }
+            })
             .AddDeveloperSigningCredential()
             .AddOperationalStore(opts =>
             {
