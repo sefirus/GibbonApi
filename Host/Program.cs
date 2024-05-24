@@ -13,7 +13,8 @@ using WebApi.Validators.SchemaValidators;
 var builder = WebApplication.CreateBuilder(args);
 IdentityModelEventSource.ShowPII = true; //Add this line
 
-// Add services to the container.
+builder.Configuration.AddEnvironmentVariables();
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddApplicationServices();

@@ -2,6 +2,8 @@ using IdentityServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 builder.Services.AddControllers();
 
 var config = builder.Configuration;
