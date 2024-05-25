@@ -34,8 +34,8 @@ public class DocumentsController : ControllerBase
                 ErrorMessage = result.Errors.FirstOrDefault()?.Message
             });
         }
-        var json = StoredDocumentSerializer.SerializeDocument(result.Value);
-        return Ok(json.Value);
+        //var json = StoredDocumentSerializer.SerializeDocument(result.Value);
+        return Ok();
     }
     
     [Authorize(Roles = AccessLevels.GeneralAccess)]
@@ -60,8 +60,8 @@ public class DocumentsController : ControllerBase
                 ErrorMessage = result.Errors.FirstOrDefault()?.Message
             });
         }
-        var json = StoredDocumentSerializer.SerializeDocument(result.Value);
-        return Ok(json.Value);
+        //var json = StoredDocumentSerializer.SerializeDocument(result.Value);
+        return Ok();
     }
 
     

@@ -213,11 +213,7 @@ public class WorkspaceService : IWorkspaceService
         foreach (var schemaObject in schemaObjects)
         {
             var documentsCount = schemaObject.StoredDocuments.Count;
-            var fieldsCount = schemaObjects
-                .SelectMany(s => s.Fields)
-                .SelectMany(s => s.ChildFields ?? Enumerable.Empty<SchemaField>())
-                .SelectMany(s => s.ChildFields ?? Enumerable.Empty<SchemaField>())
-                .Count();
+            var fieldsCount = CountAllFields(schemaObject);
             var viewModel = schemaMapper.Map(schemaObject);
             viewModel.NumberOfDocuments = documentsCount;
             viewModel.NumberOfFields = fieldsCount;
@@ -225,6 +221,34 @@ public class WorkspaceService : IWorkspaceService
         }
 
         return schema;
+    }
+    private static int CountAllFields(SchemaObject schemaObject)
+    {
+        int count = schemaObject.Fields.Count(); 
+
+        foreach (var field in schemaObject.Fields)
+        {
+            count += CountChildFields(field);
+        }
+
+        return count;
+    }
+
+    private static int CountChildFields(SchemaField field)
+    {
+        int count = 0;
+
+        if (field.ChildFields is null)
+        {
+            return count;
+        }
+        foreach (var childField in field.ChildFields)
+        {
+            count++;
+            count += CountChildFields(childField);
+        }
+
+        return count;
     }
 
     public async Task<Result<RichReadWorkspaceViewModel>> GetWorkspace(Guid workspaceId)
